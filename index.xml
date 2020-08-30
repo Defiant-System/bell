@@ -7,8 +7,8 @@
 		<meta name="width" value="640"/>
 		<meta name="height" value="480"/>
 		<meta name="top" value="120"/>
-		<meta name="left" value="120"/>
-		<meta name="headless" value="1"/>
+		<meta name="left" value="260"/>
+		<meta name="headless" value="true"/>
 		<meta name="minimize" value="false"/>
 		<meta name="maximize" value="false"/>
 		<meta name="resize" value="disabled"/>

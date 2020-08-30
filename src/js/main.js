@@ -14,14 +14,20 @@ const facetime = {
 						video: true,
 						audio: true
 					}).then(stream => {
-						let video = this.video[0];
+						let video = Self.video[0];
 						
+						Self.stream = stream;
+
 						video.srcObject = stream;
 						video.muted = true;
 						video.addEventListener("loadedmetadata", () => {
 							video.play();
 						});
 					});
+				break;
+			case "window.close":
+				Self.video[0].src = "";
+				Self.stream.getTracks().map(item => item.stop());
 				break;
 		}
 	}
