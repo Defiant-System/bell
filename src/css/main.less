@@ -158,7 +158,82 @@ content {
 			flex-direction: column;
 			padding: 2px 0;
 
-			.contact {
+			.friend {
+				display: flex;
+				padding: 0 9px;
+				margin-bottom: 7px;
+				user-select: none;
+
+				&.online {
+					order: -1;
+
+					&:hover {
+						.name {
+							color: #fff;
+						}
+					}
+
+					.icon-offline {
+						background-image: url(~/icons/icon-online.png);
+						opacity: 1;
+					}
+
+					.name {
+						opacity: 1;
+					}
+
+					.actions {
+						display: block;
+					}
+				}
+
+				.icon-offline {
+					width: 13px;
+					height: 13px;
+					margin: 4px 5px 0 0;
+					opacity: .5;
+				}
+
+				.name {
+					flex: 1;
+					padding: 4px 0 0 0;
+					opacity: .5;
+				}
+
+				.actions {
+					display: none;
+					width: 60px;
+					text-align: right;
+					font-size: 0;
+
+					> div {
+						display: inline-block;
+						width: 21px;
+						height: 21px;
+						text-align: center;
+						padding-top: 4px;
+						margin-left: 2px;
+						border-radius: 50%;
+						cursor: pointer;
+
+						i[class^="icon-"] {
+							width: 13px;
+							height: 13px;
+							filter: invert() opacity(.25);
+						}
+
+						&:hover {
+							background: #44aa44;
+
+							i[class^="icon-"] {
+								filter: invert();
+							}
+						}
+					}
+				}
+			}
+
+			.call-entry {
 				display: flex;
 				padding: 0 7px;
 				margin-bottom: 9px;
@@ -196,8 +271,9 @@ content {
 				&.missed {
 					.details {
 						.name {
-							color: #f33;
+							color: #f55;
 							opacity: 1;
+							text-shadow: 0 1px 0 #222;
 						}
 					}
 

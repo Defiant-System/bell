@@ -11,12 +11,8 @@ const facetime = {
 			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
 		});
 
-		// render channels
-		window.render({
-			template: "calls",
-			match: `//Data/History`,
-			target: this.callList
-		});
+		// temp
+		window.find(".tab-row > div[data-arg='all']").trigger("click");
 	},
 	dispatch(event) {
 		let Self = facetime,
@@ -47,9 +43,45 @@ const facetime = {
 				}
 				break;
 			// custom events
+			case "get-call-info":
+			case "start-camera-call":
+			case "start-voice-call":
+				break;
 			case "select-tab":
-				event.el.parent().find(".tab-active").removeClass("tab-active");
-				event.el.addClass("tab-active");
+				el = event.el;
+				if (el.hasClass("tab-active")) return;
+
+				el.parent().find(".tab-active").removeClass("tab-active");
+				el.addClass("tab-active");
+				
+				// render channels
+				switch (el.data("arg")) {
+					case "all":
+						window.render({
+							template: "calls",
+							match: "//Data/History",
+							loopPath: "/xsl:for-each",
+							loopSelect: "./*",
+							target: Self.callList
+						});
+						break;
+					case "missed":
+						window.render({
+							template: "calls",
+							match: "//Data/History",
+							loopPath: "/xsl:for-each",
+							loopSelect: "./*[@duration = '0']",
+							target: Self.callList
+						});
+						break;
+					case "friends":
+						window.render({
+							template: "friends",
+							match: "sys://Settings/Friends",
+							target: Self.callList
+						});
+						break;
+				}
 				break;
 		}
 	}

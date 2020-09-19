@@ -7,7 +7,7 @@
 
 		<div>
 			<xsl:attribute name="class">
-				contact
+				call-entry
 				<xsl:if test="$user/@online = '1'"> online</xsl:if>
 				<xsl:if test="@duration = '0'"> missed</xsl:if>
 			</xsl:attribute>
@@ -37,6 +37,29 @@
 			</div>
 			<div class="actions">
 				<i class="icon-info" data-click="get-call-info"></i>
+			</div>
+		</div>
+	</xsl:for-each>
+</xsl:template>
+
+<xsl:template name="friends">
+	<xsl:for-each select="./*">
+		<div>
+			<xsl:attribute name="class">
+				friend
+				<xsl:if test="@online = '1'"> online</xsl:if>
+			</xsl:attribute>
+			<i class="icon-offline"></i>
+			<div class="name">
+				<xsl:value-of select="@name"/>
+			</div>
+			<div class="actions">
+				<div data-click="start-camera-call">
+					<i class="icon-camera"></i>
+				</div>
+				<div data-click="start-voice-call">
+					<i class="icon-phone"></i>
+				</div>
 			</div>
 		</div>
 	</xsl:for-each>
