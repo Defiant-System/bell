@@ -10,6 +10,7 @@ const facetime = {
 			el;
 		switch (event.type) {
 			case "window.open":
+				return;
 				navigator.mediaDevices.getUserMedia({
 						video: true,
 						audio: true
@@ -26,8 +27,10 @@ const facetime = {
 					});
 				break;
 			case "window.close":
-				Self.video[0].src = "";
-				Self.stream.getTracks().map(item => item.stop());
+				if (Self.stream) {
+					Self.video[0].src = "";
+					Self.stream.getTracks().map(item => item.stop());
+				}
 				break;
 		}
 	}

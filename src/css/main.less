@@ -14,13 +14,229 @@
 }
 
 content {
+	background: url(~/placeholder.jpg) 50% 50% no-repeat;
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
+	font-size: 13px;
+	color: #ddd;
+
+	i[class^="icon-"] {
+		display: inline-block;
+		vertical-align: middle;
+		width: 17px;
+		height: 17px;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+
+		&.icon-online  { background-image: url(~/icons/icon-online.png); }
+		&.icon-offline { background-image: url(~/icons/icon-offline.png); }
+		&.icon-info    { background-image: url(~/icons/icon-info.png); }
+		&.icon-camera  { background-image: url(~/icons/icon-camera.png); }
+		&.icon-phone   { background-image: url(~/icons/icon-phone.png); }
+	}
 
 	video {
 		background: transparent;
+		width: 100%;
+		height: 100%;
+	}
+
+	.sidebar {
+		backdrop-filter: blur(29px);
+		background: rgba(0,0,0,.6);
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 230px;
+		z-index: 2;
+		padding-top: 29px;
+
+		.tab-view {
+			display: flex;
+			flex-direction: column;
+			height: calc(100% + 11px);
+
+			.tab-row {
+				position: relative;
+				height: 23px;
+				text-align: center;
+				font-size: 0;
+
+				> div {
+					background: #666;
+					color: #eee;
+					position: relative;
+					display: inline-block;
+					padding: 4px 13px 3px;
+					font-size: 12px;
+					text-shadow: 0 1px 0 #555;
+
+					&:first-child {
+						border-radius: 4px 0 0 4px;
+
+						&.tab-active:after {
+							content: "";
+							position: absolute;
+							top: -1px;
+							bottom: -1px;
+							right: -1px;
+							width: 0;
+							z-index: 2;
+						}
+					}
+
+					&:last-child {
+						border-radius: 0 4px 4px 0;
+					}
+
+					&.tab-active {
+						background: #cdcdcd;
+						color: #555;
+						border: 0;
+						z-index: 2;
+						text-shadow: 0 0 0;
+					}
+
+					&:not(.tab-active) {
+						cursor: pointer;
+					}
+				}
+			}
+
+			.tab-body {
+				flex: auto;
+				overflow: auto;
+				padding-top: 5px;
+			}
+		}
+
+		.contact-list {
+			display: flex;
+			flex-direction: column;
+			padding: 2px 0;
+
+			.contact {
+				display: flex;
+				padding: 0 7px;
+				margin-bottom: 7px;
+				user-select: none;
+
+				&:hover {
+					.name {
+						color: #fff;
+					}
+				}
+
+				&.offline {
+					order: 2;
+
+					.avatar {
+						opacity: .5;
+						filter: grayscale();
+					}
+
+					.details {
+						.name {
+							opacity: .5;
+							
+							.icon-online {
+								background-image: url(~/icons/icon-offline.png);
+								opacity: .5;
+							}
+						}
+
+						.last-call {
+							opacity: .25;
+						}
+					}
+
+					.actions {
+						.action[data-click="call-user"] {
+							display: none;
+						}
+					}
+				}
+
+				.avatar {
+					background: rgba(255,255,255,.25);
+					background-image: url(/ant/icons/user.png);
+					display: inline-block;
+					width: 27px;
+					height: 27px;
+					border-radius: 50%;
+					margin-right: 5px;
+					margin-top: 2px;
+				}
+
+				.details {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					overflow: hidden;
+
+					i[class^="icon-"] {
+						position: relative;
+						top: 3px;
+						width: 11px;
+						height: 11px;
+						display: inline-block;
+						vertical-align: text-top;
+						margin-right: -1px;
+					}
+
+					.name {
+						font-weight: 500;
+						padding-bottom: 2px;
+						font-size: 14px;
+						display: block;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+
+					.last-call {
+						opacity: .4;
+						display: block;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+
+				.actions {
+					width: 23px;
+					margin-left: 5px;
+					padding-top: 3px;
+					text-align: right;
+
+					.action {
+						background: rgba(255,255,255,.15);
+						width: 23px;
+						height: 23px;
+						display: inline-block;
+						vertical-align: text-top;
+						text-align: center;
+						padding-top: 4px;
+						border-radius: 50%;
+						cursor: pointer;
+
+						&:hover {
+							background: #44aa44;
+						}
+
+						i[class^="icon-"] {
+							width: 15px;
+							height: 15px;
+							filter: opacity(.5);
+						}
+					}
+				}
+			}
+		}
 	}
 }
