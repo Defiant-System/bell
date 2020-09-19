@@ -3,7 +3,15 @@ const facetime = {
 	init() {
 		// fast references
 		this.content = window.find("content");
+		this.callList = window.find(".call-list");
 		this.video = window.find("video");
+
+		// render channels
+		window.render({
+			template: "calls",
+			match: `//Data/History`,
+			target: this.callList
+		});
 	},
 	dispatch(event) {
 		let Self = facetime,

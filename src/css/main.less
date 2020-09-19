@@ -37,6 +37,8 @@ content {
 		&.icon-info    { background-image: url(~/icons/icon-info.png); }
 		&.icon-camera  { background-image: url(~/icons/icon-camera.png); }
 		&.icon-phone   { background-image: url(~/icons/icon-phone.png); }
+		&.icon-in      { background-image: url(~/icons/icon-in.png); }
+		&.icon-out     { background-image: url(~/icons/icon-out.png); }
 	}
 
 	video {
@@ -74,6 +76,7 @@ content {
 					display: inline-block;
 					padding: 4px 13px 3px;
 					font-size: 12px;
+					border-left: 1px solid rgba(0,0,0,.25);
 					text-shadow: 0 1px 0 #555;
 
 					&:first-child {
@@ -95,8 +98,8 @@ content {
 					}
 
 					&.tab-active {
-						background: #cdcdcd;
-						color: #555;
+						background: #aaa;
+						color: #111;
 						border: 0;
 						z-index: 2;
 						text-shadow: 0 0 0;
@@ -115,7 +118,7 @@ content {
 			}
 		}
 
-		.contact-list {
+		.call-list {
 			display: flex;
 			flex-direction: column;
 			padding: 2px 0;
@@ -169,7 +172,7 @@ content {
 					width: 27px;
 					height: 27px;
 					border-radius: 50%;
-					margin-right: 5px;
+					margin-right: 7px;
 					margin-top: 2px;
 				}
 
@@ -205,6 +208,22 @@ content {
 						overflow: hidden;
 						text-overflow: ellipsis;
 						white-space: nowrap;
+
+						i[class^="icon-"] {
+							top: 1px;
+							display: inline-block;
+							vertical-align: text-top;
+							width: 13px;
+							height: 13px;
+							filter: invert() opacity(.5);
+
+							&:nth-child(2) {
+								top: 3px;
+								margin-right: 2px;
+								width: 9px;
+								height: 9px;
+							}
+						}
 					}
 				}
 
@@ -214,26 +233,10 @@ content {
 					padding-top: 3px;
 					text-align: right;
 
-					.action {
-						background: rgba(255,255,255,.15);
-						width: 23px;
-						height: 23px;
-						display: inline-block;
-						vertical-align: text-top;
-						text-align: center;
-						padding-top: 4px;
-						border-radius: 50%;
-						cursor: pointer;
-
-						&:hover {
-							background: #44aa44;
-						}
-
-						i[class^="icon-"] {
-							width: 15px;
-							height: 15px;
-							filter: opacity(.5);
-						}
+					i[class^="icon-"] {
+						width: 19px;
+						height: 19px;
+						filter: invert() opacity(.25);
 					}
 				}
 			}
