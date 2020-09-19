@@ -11,7 +11,11 @@
 				<xsl:if test="$user/@online = '1'"> online</xsl:if>
 				<xsl:if test="@duration = '0'"> missed</xsl:if>
 			</xsl:attribute>
-			<span class="avatar"></span>
+			<span class="avatar">
+				<xsl:if test="$user/@avatar">
+					<xsl:attribute name="style">background-image: url(<xsl:value-of select="$user/@avatar"/>);</xsl:attribute>
+				</xsl:if>
+			</span>
 			<div class="details">
 				<span class="name">
 					<i class="icon-online"></i>

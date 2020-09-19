@@ -3,9 +3,16 @@
 
 		<div class="tab-view">
 			<div class="tab-row">
-				<div class="tab-active">All</div>
-				<div>Missed</div>
-				<div>Friends</div>
+				<div data-click="select-tab" data-arg="all" class="tab-active">All</div>
+				<div data-click="select-tab" data-arg="missed">Missed</div>
+				<div data-click="select-tab" data-arg="friends">Friends</div>
+			</div>
+
+			<div class="search-row">
+				<div class="input-wrapper">
+					<input type="text" placeholder="Enter name" />
+					<i class="icon-search"></i>
+				</div>
 			</div>
 
 			<div class="tab-body">

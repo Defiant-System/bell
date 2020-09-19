@@ -1,7 +1,8 @@
 <Data>
 	<History>
+		<i username="hbi" type="camera" inbound="1" stamp="1595106835076" duration="50" />
 		<i username="sarienn" type="voice" inbound="0" stamp="1595206835076" duration="213" />
-		<i username="urbanal" type="camera" inbound="1" stamp="1595106835076" duration="50" />
+		<i username="urbanal" type="camera" inbound="1" stamp="1595106835076" duration="0" />
 		<i username="bill" type="camera" inbound="0" stamp="1595306146929" duration="174" />
 		<i username="steve" type="voice" inbound="0" stamp="1595006336924" duration="0" />
 	</History>

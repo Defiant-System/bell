@@ -22,6 +22,7 @@ const facetime = {
 		let Self = facetime,
 			el;
 		switch (event.type) {
+			// system events
 			case "window.open":
 				return;
 				navigator.mediaDevices.getUserMedia({
@@ -44,6 +45,11 @@ const facetime = {
 					Self.video[0].src = "";
 					Self.stream.getTracks().map(item => item.stop());
 				}
+				break;
+			// custom events
+			case "select-tab":
+				event.el.parent().find(".tab-active").removeClass("tab-active");
+				event.el.addClass("tab-active");
 				break;
 		}
 	}

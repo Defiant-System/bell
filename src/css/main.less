@@ -32,6 +32,7 @@ content {
 		background-repeat: no-repeat;
 		background-position: 50% 50%;
 
+		&.icon-search  { background-image: url(~/icons/icon-search.png); }
 		&.icon-online  { background-image: url(~/icons/icon-online.png); }
 		&.icon-offline { background-image: url(~/icons/icon-offline.png); }
 		&.icon-info    { background-image: url(~/icons/icon-info.png); }
@@ -49,7 +50,7 @@ content {
 
 	.sidebar {
 		backdrop-filter: blur(29px);
-		background: rgba(0,0,0,.6);
+		background: rgba(30,30,30,.6);
 		position: absolute;
 		top: 0;
 		bottom: 0;
@@ -61,7 +62,7 @@ content {
 		.tab-view {
 			display: flex;
 			flex-direction: column;
-			height: calc(100% + 11px);
+			height: 100%;
 
 			.tab-row {
 				position: relative;
@@ -111,10 +112,44 @@ content {
 				}
 			}
 
+			.search-row {
+				height: 31px;
+				padding: 5px 7px 0;
+				// border-bottom: 1px solid rgba(255,255,255,.15);
+
+				.input-wrapper {
+					background: rgba(255,255,255,.15);
+					position: relative;
+					border-radius: 3px;
+
+					.icon-search {
+						position: absolute;
+						top: 3px;
+						left: 8px;
+						width: 15px;
+						height: 15px;
+						filter: invert() opacity(.5);
+					}
+
+					input {
+						background: transparent;
+						padding: 3px 3px 3px 34px;
+						box-shadow: 0 0 0;
+						border: 0;
+						font-size: 13px;
+						color: #fff;
+
+						&::-webkit-input-placeholder {
+							color: #aaa;
+						}
+					}
+				}
+			}
+
 			.tab-body {
 				flex: auto;
 				overflow: auto;
-				padding-top: 5px;
+				padding-top: 2px;
 			}
 		}
 
@@ -126,7 +161,7 @@ content {
 			.contact {
 				display: flex;
 				padding: 0 7px;
-				margin-bottom: 7px;
+				margin-bottom: 9px;
 				user-select: none;
 
 				&:hover {
@@ -140,7 +175,6 @@ content {
 
 					.avatar {
 						opacity: 1;
-						filter: none;
 					}
 
 					.details {
@@ -163,22 +197,28 @@ content {
 					.details {
 						.name {
 							color: #f33;
+							opacity: 1;
 						}
 					}
 
 				}
 
 				.avatar {
-					background: rgba(255,255,255,.25);
-					background-image: url(/ant/icons/user.png);
+					background: url(~/icons/icon-user.png) 50% 50%/contain no-repeat;
 					display: inline-block;
 					width: 27px;
 					height: 27px;
 					border-radius: 50%;
 					margin-right: 7px;
 					margin-top: 2px;
-					opacity: .5;
-					filter: grayscale();
+					border-radius: 50%;
+					opacity: .6;
+				//	box-shadow: inset 0 0 0 1px rgba(0,0,0,.8);
+					
+					&:not([style]) {
+						filter: invert();
+						opacity: .35;
+					}
 				}
 
 				.details {
