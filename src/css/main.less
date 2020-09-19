@@ -135,34 +135,37 @@ content {
 					}
 				}
 
-				&.offline {
-					order: 2;
+				&.online {
+					order: -1;
 
 					.avatar {
-						opacity: .5;
-						filter: grayscale();
+						opacity: 1;
+						filter: none;
 					}
 
 					.details {
 						.name {
-							opacity: .5;
+							opacity: 1;
 							
 							.icon-online {
-								background-image: url(~/icons/icon-offline.png);
-								opacity: .5;
+								background-image: url(~/icons/icon-online.png);
+								opacity: 1;
 							}
 						}
 
 						.last-call {
-							opacity: .25;
+							opacity: .4;
+						}
+					}
+				}
+
+				&.missed {
+					.details {
+						.name {
+							color: #f33;
 						}
 					}
 
-					.actions {
-						.action[data-click="call-user"] {
-							display: none;
-						}
-					}
 				}
 
 				.avatar {
@@ -174,6 +177,8 @@ content {
 					border-radius: 50%;
 					margin-right: 7px;
 					margin-top: 2px;
+					opacity: .5;
+					filter: grayscale();
 				}
 
 				.details {
@@ -181,16 +186,6 @@ content {
 					display: flex;
 					flex-direction: column;
 					overflow: hidden;
-
-					i[class^="icon-"] {
-						position: relative;
-						top: 3px;
-						width: 11px;
-						height: 11px;
-						display: inline-block;
-						vertical-align: text-top;
-						margin-right: -1px;
-					}
 
 					.name {
 						font-weight: 500;
@@ -200,17 +195,33 @@ content {
 						overflow: hidden;
 						text-overflow: ellipsis;
 						white-space: nowrap;
+						opacity: .5;
+
+						i[class^="icon-"] {
+							position: relative;
+							top: 3px;
+							width: 11px;
+							height: 11px;
+							display: inline-block;
+							vertical-align: text-top;
+							margin-right: 3px;
+							background-image: url(~/icons/icon-offline.png);
+							opacity: .5;
+						}
 					}
 
 					.last-call {
-						opacity: .4;
+						opacity: .25;
 						display: block;
 						overflow: hidden;
 						text-overflow: ellipsis;
 						white-space: nowrap;
+						font-size: 12px;
 
 						i[class^="icon-"] {
+							position: relative;
 							top: 1px;
+							left: 1px;
 							display: inline-block;
 							vertical-align: text-top;
 							width: 13px;
@@ -219,7 +230,7 @@ content {
 
 							&:nth-child(2) {
 								top: 3px;
-								margin-right: 2px;
+								margin: 0 4px 0 1px;
 								width: 9px;
 								height: 9px;
 							}
@@ -237,6 +248,7 @@ content {
 						width: 19px;
 						height: 19px;
 						filter: invert() opacity(.25);
+						cursor: pointer;
 					}
 				}
 			}

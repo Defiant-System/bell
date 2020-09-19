@@ -2,17 +2,33 @@
 
 <xsl:template name="calls">
 	<xsl:for-each select="./*">
-		<div class="contact">
+		<xsl:sort order="ascending" select="@stamp"/>
+		<xsl:variable name="user" select="//Friends/i[@id = current()/@username]"/>
+
+		<div>
+			<xsl:attribute name="class">
+				contact
+				<xsl:if test="$user/@online = '1'"> online</xsl:if>
+				<xsl:if test="@duration = '0'"> missed</xsl:if>
+			</xsl:attribute>
 			<span class="avatar"></span>
 			<div class="details">
 				<span class="name">
 					<i class="icon-online"></i>
-					<xsl:value-of select="@username"/>
+					<xsl:value-of select="$user/@name"/>
 				</span>
 				<span class="last-call">
-					<i class="icon-phone"></i>
-					<i class="icon-out"></i>
-					<xsl:value-of select="@stamp"/>
+					<i class="icon-camera">
+						<xsl:if test="@type = 'voice'">
+							<xsl:attribute name="class">icon-phone</xsl:attribute>
+						</xsl:if>
+					</i>
+					<i class="icon-out">
+						<xsl:if test="@inbound = '0'">
+							<xsl:attribute name="class">icon-in</xsl:attribute>
+						</xsl:if>
+					</i>
+					<xsl:value-of select="@timestamp"/>
 				</span>
 			</div>
 			<div class="actions">

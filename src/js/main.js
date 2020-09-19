@@ -6,6 +6,11 @@ const facetime = {
 		this.callList = window.find(".call-list");
 		this.video = window.find("video");
 
+		window.bluePrint.selectNodes("//History/i").map(call => {
+			let timestamp = defiant.moment(+call.getAttribute("stamp"));
+			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
+		});
+
 		// render channels
 		window.render({
 			template: "calls",
