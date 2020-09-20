@@ -62,7 +62,8 @@ content {
 				border-radius: 4px;
 
 				&:after {
-					display: block;
+					opacity: 1;
+					visibility: visible;
 				}
 			}
 
@@ -100,7 +101,6 @@ content {
 				transition: 500ms ease-in-out;
 				
 				&:after {
-					display: none;
 					content: "";
 					position: absolute;
 					top: 0;
@@ -109,9 +109,12 @@ content {
 					bottom: 0;
 					z-index: 2;
 					border-radius: inherit;
+					opacity: 0;
+					visibility: hidden;
 					box-shadow: inset 0 0 0 1px rgba(255,255,255,.5),
 								0 3px 7px rgba(0,0,0,.75),
 								0 5px 17px rgba(0,0,0,.75);
+					transition: 500ms ease-in-out;
 				}
 			}
 		}

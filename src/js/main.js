@@ -19,7 +19,7 @@ const facetime = {
 		});
 
 		// temp
-		window.find(".tab-row > div[data-arg='friends']").trigger("click");
+		window.find(".tab-row > div[data-arg='all']").trigger("click");
 	},
 	dispatch(event) {
 		let Self = facetime,
