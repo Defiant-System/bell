@@ -1,10 +1,17 @@
 
 const facetime = {
+	els: {},
 	init() {
 		// fast references
-		this.content = window.find("content");
-		this.callList = window.find(".call-list");
-		this.video = window.find("video");
+		this.els = {
+			content: window.find("content"),
+			sidebar: window.find(".sidebar"),
+			sidebarToggler: window.find(".sidebar-toggler"),
+			callList: window.find(".call-list"),
+			videoCall: window.find(".video-call"),
+			meVideo: window.find(".me video"),
+			meOther: window.find(".other video"),
+		};
 
 		window.bluePrint.selectNodes("//History/i").map(call => {
 			let timestamp = defiant.moment(+call.getAttribute("stamp"));
@@ -12,10 +19,11 @@ const facetime = {
 		});
 
 		// temp
-		window.find(".tab-row > div[data-arg='all']").trigger("click");
+		window.find(".tab-row > div[data-arg='friends']").trigger("click");
 	},
 	dispatch(event) {
 		let Self = facetime,
+			isOn,
 			el;
 		switch (event.type) {
 			// system events
@@ -25,7 +33,7 @@ const facetime = {
 						video: true,
 						audio: true
 					}).then(stream => {
-						let video = Self.video[0];
+						let video = Self.els.meVideo[0];
 						
 						Self.stream = stream;
 
@@ -38,14 +46,47 @@ const facetime = {
 				break;
 			case "window.close":
 				if (Self.stream) {
-					Self.video[0].src = "";
+					Self.els.meVideo[0].src = "";
 					Self.stream.getTracks().map(item => item.stop());
 				}
 				break;
 			// custom events
+			case "toggle-camera":
+				el = event.el.find("i");
+				isOn = el.hasClass("icon-camera");
+				
+				if (isOn) {
+					el.prop({ className: "icon-camera-off" });
+				} else {
+					el.prop({ className: "icon-camera" });
+				}
+				break;
+			case "toggle-microphone":
+				el = event.el.find("i");
+				isOn = el.hasClass("icon-mic-on");
+				
+				if (isOn) {
+					el.prop({ className: "icon-mic-mute" });
+				} else {
+					el.prop({ className: "icon-mic-on" });
+				}
+				break;
+			case "end-call":
+				Self.els.videoCall.removeClass("ongoing");
+				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				break;
+			case "toggle-sidebar":
+				if (event.value === "show") isOn = false;
+				isOn = isOn || Self.els.sidebarToggler.hasClass("push-in");
+				Self.els.sidebarToggler.toggleClass("push-in", isOn);
+				Self.els.sidebar.toggleClass("open", isOn);
+				break;
 			case "get-call-info":
+				break;
 			case "start-camera-call":
 			case "start-voice-call":
+				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
+				Self.els.videoCall.addClass("ongoing");
 				break;
 			case "select-tab":
 				el = event.el;
@@ -62,7 +103,7 @@ const facetime = {
 							match: "//Data/History",
 							loopPath: "/xsl:for-each",
 							loopSelect: "./*",
-							target: Self.callList
+							target: Self.els.callList
 						});
 						break;
 					case "missed":
@@ -71,14 +112,14 @@ const facetime = {
 							match: "//Data/History",
 							loopPath: "/xsl:for-each",
 							loopSelect: "./*[@duration = '0']",
-							target: Self.callList
+							target: Self.els.callList
 						});
 						break;
 					case "friends":
 						window.render({
 							template: "friends",
 							match: "sys://Settings/Friends",
-							target: Self.callList
+							target: Self.els.callList
 						});
 						break;
 				}

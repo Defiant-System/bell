@@ -1,6 +1,5 @@
 <content>
-	<div class="sidebar">
-
+	<div class="sidebar open">
 		<div class="tab-view">
 			<div class="tab-row">
 				<div data-click="select-tab" data-arg="all">All</div>
@@ -16,123 +15,31 @@
 			</div>
 
 			<div class="tab-body">
-
-				<div class="call-list"><!--
-					<div class="contact">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Hakan Bilgin
-							</span>
-							<span class="last-call">
-								<i class="icon-phone"></i>
-								<i class="icon-out"></i>
-								2020-05-23
-							</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					
-					<div class="contact">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Steve Jobs
-							</span>
-							<span class="last-call">
-								<i class="icon-camera"></i>
-								<i class="icon-in"></i>
-								2020-02-02
-							</span>
-						</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					
-					<div class="contact offline inbound">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Bill Gates
-							</span>
-							<span class="last-call">
-								<i class="icon-phone"></i>
-								<i class="icon-out"></i>
-								2019-11-14
-							</span>
-						</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					
-					<div class="contact outbound">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Hakan Bilgin
-							</span>
-							<span class="last-call">
-								<i class="icon-phone"></i>
-								<i class="icon-in"></i>
-								2020-05-23
-							</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					
-					<div class="contact missed">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Steve Jobs
-							</span>
-							<span class="last-call">
-								<i class="icon-phone"></i>
-								<i class="icon-in"></i>
-								2020-02-02
-							</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					
-					<div class="contact offline">
-						<span class="avatar"></span>
-						<div class="details">
-							<span class="name">
-								<i class="icon-online"></i>
-								Bill Gates
-							</span>
-							<span class="last-call">
-								<i class="icon-phone"></i>
-								<i class="icon-out"></i>
-								2019-11-14
-							</span>
-						</div>
-						<div class="actions">
-							<i class="icon-info" data-click="get-call-info"></i>
-						</div>
-					</div>
-					-->
+				<div class="call-list">
+					<!-- Call entries goes here -->
 				</div>
-
 			</div>
 		</div>
-
 	</div>
-	<video></video>
+
+	<div class="video-call">
+		<div class="video me"><video></video></div>
+		<div class="video other"><video></video></div>
+
+		<div class="sidebar-toggler push-in" data-click="toggle-sidebar">
+			<i class="icon-sidebar"></i>
+		</div>
+
+		<div class="call-actions">
+			<div class="camera" data-click="toggle-camera">
+				<i class="icon-camera"></i>
+			</div>
+			<div class="microphone" data-click="toggle-microphone">
+				<i class="icon-mic-on"></i>
+			</div>
+			<div class="end-call" data-click="end-call">
+				<i class="icon-hangup"></i>
+			</div>
+		</div>
+	</div>
 </content>
