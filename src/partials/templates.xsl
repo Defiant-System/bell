@@ -36,7 +36,12 @@
 				</span>
 			</div>
 			<div class="actions">
-				<i class="icon-info" data-click="get-call-info"></i>
+				<div data-click="start-camera-call">
+					<i class="icon-camera"></i>
+				</div>
+				<div data-click="start-voice-call">
+					<i class="icon-phone"></i>
+				</div>
 			</div>
 		</div>
 	</xsl:for-each>
