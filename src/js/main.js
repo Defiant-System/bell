@@ -113,6 +113,8 @@ const facetime = {
 				} else {
 					el.prop({ className: "icon-camera" });
 				}
+				// camera mute status
+				Self.els.videoMe[0][ ! isOn ? "play" : "pause" ]();
 				break;
 			case "toggle-microphone":
 				el = event.el.find("i");
@@ -123,10 +125,25 @@ const facetime = {
 				} else {
 					el.prop({ className: "icon-mic-on" });
 				}
+				// microphone mute status
+				Self.els.videoMe[0].muted = ! isOn;
 				break;
-			case "answer-call":
+			case "accept-call":
+				// send call request
+				window.net.send({
+					action: "accept",
+					from: ME,
+					to: Self.els.videoCall.data("username"),
+				});
 				break;
-			case "cancel-call":
+			case "decline-call":
+				// send call request
+				window.net.send({
+					action: "decline",
+					from: ME,
+					to: Self.els.videoCall.data("username"),
+				});
+				break;
 			case "end-call":
 				// send call request
 				window.net.send({

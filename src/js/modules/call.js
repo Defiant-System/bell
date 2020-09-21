@@ -19,33 +19,48 @@ const Call = {
 				Self.el = window.find(".video-call");
 				// reference data for active call
 				Self.data = {
+					type,
 					user1: event.from,
 					user2: event.to,
 					channel: event.channel,
 				};
 
+				// adapt screen based up on call type
 				if (event.from === ME) {
-					// adapt screen based up on call type
 					user = defiant.user.friend(event.to);
 					Self.el.data({ "username": user.username });
 					Self.el.find(".other h2 .user").html(user.name);
 					APP.dispatch({ type: "toggle-sidebar", value: "hide" });
 					APP.els.videoCall.addClass(`outbound-${type}-request`);
-					return;
+				} else {
+					user = defiant.user.friend(event.from);
+					Self.el.data({ "username": user.username });
+					Self.el.find(".other h2 .user").html(user.name);
+					APP.dispatch({ type: "toggle-sidebar", value: "hide" });
+					APP.els.videoCall.addClass(`inbound-${type}-request`);
 				}
-
-				// adapt screen based up on call type
-				user = defiant.user.friend(event.from);
-				Self.el.data({ "username": user.username });
-				Self.el.find(".other h2 .user").html(user.name);
-				APP.dispatch({ type: "toggle-sidebar", value: "hide" });
-				APP.els.videoCall.addClass(`inbound-${type}-request`);
 				break;
 			case "hang-up":
+			case "decline":
+				if (event.from === ME) {
+					console.log(`I, ${ME}, ${event.action} call`);
+				} else {
+					user = defiant.user.friend(Self.el.data("username"));
+					console.log(`${user.name}, ${event.action} call`);
+				}
+				// adapt screen based up on call type
 				Self.el.prop({ className: "video-call" });
 				APP.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
-			case "dismiss":
+			case "accept":
+				if (event.from === ME) {
+					console.log(`I, ${ME}, ${event.action} call`);
+				} else {
+					user = defiant.user.friend(Self.el.data("username"));
+					console.log(`${user.name}, ${event.action} call`);
+				}
+				// adapt screen based up on call type
+				Self.el.prop({ className: `video-call ongoing-${Self.data.type}-call` });
 				break;
 			case "audio-on":
 				break;

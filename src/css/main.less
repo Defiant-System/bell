@@ -189,6 +189,78 @@ content {
 			}
 		}
 
+		&.ongoing-voice-call {
+			.video {
+				&.other video,
+				&.me {
+			 		display: none;
+				}
+
+				h2.inbound {
+					display: block;
+
+					.verb {
+						display: none;
+					}
+				}
+			}
+
+			.call-actions {
+				opacity: 1;
+				visibility: visible;
+				
+				.camera,
+				.microphone,
+				.end-call {
+					opacity: 1;
+					display: inline-block;
+				}
+				.answer-voice,
+				.answer-camera,
+				.cancel {
+					display: none;
+				}
+			}
+		}
+
+		&.ongoing-camera-call {
+			.video {
+				&.me {
+					top: 17px;
+					right: 17px;
+					width: 160px;
+					height: 100px;
+					border-radius: 4px;
+
+					&:after {
+						opacity: 1;
+						visibility: visible;
+					}
+				}
+
+				h2 {
+					display: none;
+				}
+			}
+
+			.call-actions {
+				opacity: 1;
+				visibility: visible;
+
+				.camera,
+				.microphone,
+				.end-call {
+					opacity: 1;
+					display: inline-block;
+				}
+				.answer-voice,
+				.answer-camera,
+				.cancel {
+					display: none;
+				}
+			}
+		}
+
 		&.call-ended {
 			.video.other {
 				background: #000;
