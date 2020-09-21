@@ -12,7 +12,7 @@ const Call = {
 			from,
 			to,
 			el;
-		console.log(event);
+		//console.log(event);
 		switch (event.action) {
 			case "inititate":
 				type = event.channel.split("-")[0];
