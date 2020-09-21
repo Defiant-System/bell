@@ -24,6 +24,10 @@ const facetime = {
 
 		// temp
 		window.find(".tab-row > div[data-arg='all']").trigger("click");
+
+		if (ME === "bill") {
+			window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-voice-call']").trigger("click");
+		}
 	},
 	dispatch(event) {
 		let Self = facetime,
@@ -166,7 +170,11 @@ const facetime = {
 					from: ME,
 					to: user.username,
 					channel: `${type}-${$.uuidv4()}`,
-					message: "&#8230;is calling you.",
+					message: `<b>${user.name}</b> is calling you.`,
+					options: [
+						{ name: "Accept", payload: "action,channel" },
+						{ name: "Decline", payload: "action,channel" }
+					]
 				});
 				break;
 		}
