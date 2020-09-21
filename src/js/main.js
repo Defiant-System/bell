@@ -172,8 +172,16 @@ const facetime = {
 					channel: `${type}-${$.uuidv4()}`,
 					message: `<b>${user.name}</b> is calling you.`,
 					options: [
-						{ name: "Accept", payload: "action,channel" },
-						{ name: "Decline", payload: "action,channel" }
+						{
+							id: defiant.AFFIRMATIVE,
+							name: "Accept",
+							payload: "action,channel",
+						},
+						{
+							id: defiant.NEGATIVE,
+							name: "Decline",
+							payload: "action,channel",
+						}
 					]
 				});
 				break;
