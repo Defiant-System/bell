@@ -23,14 +23,36 @@
 	</div>
 
 	<div class="video-call">
-		<div class="video me"><video></video></div>
-		<div class="video other"><video></video></div>
+		<div class="video me">
+			<video></video>
+		</div>
+
+		<div class="video other">
+			<h2 class="inbound">
+				<span class="user">Steve Jobs</span>
+				<span class="verb">is calling</span>
+			</h2>
+			<h2 class="outbound">
+				<span class="verb">Calling</span>
+				<span class="user">Steve Jobs</span>
+			</h2>
+			<video></video>
+		</div>
 
 		<div class="sidebar-toggler push-in" data-click="toggle-sidebar">
 			<i class="icon-sidebar"></i>
 		</div>
 
 		<div class="call-actions">
+			<div class="answer-voice" data-click="answer-call">
+				<i class="icon-phone"></i>
+			</div>
+			<div class="answer-camera" data-click="answer-call">
+				<i class="icon-camera"></i>
+			</div>
+			<div class="cancel" data-click="cancel-call">
+				<i class="icon-cancel"></i>
+			</div>
 			<div class="camera" data-click="toggle-camera">
 				<i class="icon-camera"></i>
 			</div>
