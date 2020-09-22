@@ -1,10 +1,9 @@
 
 let Peer;
 window.fetch("~/js/bundle.js").then(lib => {
-	console.log(lib);
 	Peer = lib.Peer;
 	// init applications
-	//facetime.dispatch({ type: "init-peer-js" });
+	facetime.dispatch({ type: "init-peer-js" });
 });
 
 defiant.require("modules/call.js");
@@ -78,7 +77,11 @@ const facetime = {
 				break;
 			// custom events
 			case "init-peer-js":
-				console.log(Peer);
+				//console.log(Peer);
+
+				let myPeer = new Peer(undefined, { host: "/", port: "3001" });
+				console.log(myPeer);
+
 				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;

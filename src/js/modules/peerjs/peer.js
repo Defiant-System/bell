@@ -1,9 +1,10 @@
 
-import * as util from "./util.js"
-import { EventEmitter } from "./eventemitter.js";
-import { logger } from "./logger.js";
-import { Socket } from "./socket.js";
-import { MediaConnection } from "./mediaconnection.js";
+import * as Utils from "./utils.js"
+import { API } from "./api.js";
+import { EventEmitter } from "./EventEmitter.js";
+import { Logger } from "./Logger.js";
+import { Socket } from "./Socket.js";
+import { MediaConnection } from "./MediaConnection.js";
 import { DataConnection } from "./DataConnection.js";
 import {
 	PeerErrorType,
@@ -16,7 +17,7 @@ import {
 
 const Peer = (function (_super) {
 
-	util.__extends(Peer, _super);
+	Utils.__extends(Peer, _super);
 
 	function Peer(id, options) {
 		var _this = _super.call(this) || this;
@@ -39,14 +40,14 @@ const Peer = (function (_super) {
 		}
 
 		// Configurize options
-		options = util.__assign({
+		options = Utils.__assign({
 				debug: 0,
-				host: util.util.CLOUD_HOST,
-				port: util.util.CLOUD_PORT,
+				host: Utils.util.CLOUD_HOST,
+				port: Utils.util.CLOUD_PORT,
 				path: "/",
 				key: Peer.DEFAULT_KEY,
-				token: util.util.randomToken(),
-				config: util.util.defaultConfig
+				token: Utils.util.randomToken(),
+				config: Utils.util.defaultConfig
 			}, options);
 
 		_this._options = options;
@@ -71,29 +72,29 @@ const Peer = (function (_super) {
 		}
 
 		// Set whether we use SSL to same as current host
-		if (_this._options.secure === undefined && _this._options.host !== util.util.CLOUD_HOST) {
-			_this._options.secure = util.util.isSecure();
-		} else if (_this._options.host == util.util.CLOUD_HOST) {
+		if (_this._options.secure === undefined && _this._options.host !== Utils.util.CLOUD_HOST) {
+			_this._options.secure = Utils.util.isSecure();
+		} else if (_this._options.host == Utils.util.CLOUD_HOST) {
 			_this._options.secure = true;
 		}
 
 		// Set a custom log function if present
 		if (_this._options.logFunction) {
-			logger.default.setLogFunction(_this._options.logFunction);
+			Logger.setLogFunction(_this._options.logFunction);
 		}
 
-		logger.default.logLevel = _this._options.debug || 0;
-		_this._api = new api_1.API(options);
+		Logger.logLevel = _this._options.debug || 0;
+		_this._api = new API(options);
 		_this._socket = _this._createServerConnection();
 		// Sanity checks
 		// Ensure WebRTC supported
-		if (!util.util.supports.audioVideo && !util.util.supports.data) {
+		if (!Utils.util.supports.audioVideo && !Utils.util.supports.data) {
 			_this._delayedAbort(PeerErrorType.BrowserIncompatible, "The current browser does not support WebRTC");
 			return _this;
 		}
 
 		// Ensure alphanumeric id
-		if (!!userId && !util.util.validateId(userId)) {
+		if (!!userId && !Utils.util.validateId(userId)) {
 			_this._delayedAbort(PeerErrorType.InvalidID, "ID \"" + userId + "\" is invalid");
 			return _this;
 		}
@@ -150,8 +151,8 @@ const Peer = (function (_super) {
 			var e_1, _a;
 			var plainConnections = Object.create(null);
 			try {
-				for (var _b = util.__values(this._connections), _c = _b.next(); !_c.done; _c = _b.next()) {
-					var _d = util.__read(_c.value, 2), k = _d[0], v = _d[1];
+				for (var _b = Utils.__values(this._connections), _c = _b.next(); !_c.done; _c = _b.next()) {
+					var _d = Utils.__read(_c.value, 2), k = _d[0], v = _d[1];
 					plainConnections[k] = v;
 				}
 			}
@@ -248,7 +249,7 @@ const Peer = (function (_super) {
 				this._abort(PeerErrorType.InvalidKey, "API KEY \"" + this._options.key + "\" is invalid");
 				break;
 			case ServerMessageType.Leave: // Another peer has closed its connection to this peer.
-				logger.default.log("Received leave message from " + peerId);
+				Logger.log("Received leave message from " + peerId);
 				this._cleanupPeer(peerId);
 				this._connections.delete(peerId);
 				break;
@@ -261,7 +262,7 @@ const Peer = (function (_super) {
 				var connection = this.getConnection(peerId, connectionId);
 				if (connection) {
 					connection.close();
-					logger.default.warn("Offer received for existing Connection ID:" + connectionId);
+					Logger.warn("Offer received for existing Connection ID:" + connectionId);
 				}
 				// Create a new connection.
 				if (payload.type === ConnectionType.Media) {
@@ -286,13 +287,13 @@ const Peer = (function (_super) {
 					this.emit(PeerEventType.Connection, connection);
 				}
 				else {
-					logger.default.warn("Received malformed connection type:" + payload.type);
+					Logger.warn("Received malformed connection type:" + payload.type);
 					return;
 				}
 				// Find messages.
 				var messages = this._getMessages(connectionId);
 				try {
-					for (var messages_1 = util.__values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
+					for (var messages_1 = Utils.__values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
 						var message_1 = messages_1_1.value;
 						connection.handleMessage(message_1);
 					}
@@ -308,7 +309,7 @@ const Peer = (function (_super) {
 			}
 			default: {
 				if (!payload) {
-					logger.default.warn("You received a malformed message from " + peerId + " of type " + type);
+					Logger.warn("You received a malformed message from " + peerId + " of type " + type);
 					return;
 				}
 				var connectionId = payload.connectionId;
@@ -322,7 +323,7 @@ const Peer = (function (_super) {
 					this._storeMessage(connectionId, message);
 				}
 				else {
-					logger.default.warn("You received an unrecognized message:", message);
+					Logger.warn("You received an unrecognized message:", message);
 				}
 				break;
 			}
@@ -355,7 +356,7 @@ const Peer = (function (_super) {
 	Peer.prototype.connect = function (peer, options) {
 		if (options === void 0) { options = {}; }
 		if (this.disconnected) {
-			logger.default.warn("You cannot connect to a new Peer because you called " +
+			Logger.warn("You cannot connect to a new Peer because you called " +
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect, or call reconnect " +
 				"on this peer if you believe its ID to still be available.");
@@ -374,14 +375,14 @@ const Peer = (function (_super) {
 	Peer.prototype.call = function (peer, stream, options) {
 		if (options === void 0) { options = {}; }
 		if (this.disconnected) {
-			logger.default.warn("You cannot connect to a new Peer because you called " +
+			Logger.warn("You cannot connect to a new Peer because you called " +
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect.");
 			this.emitError(PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
 			return;
 		}
 		if (!stream) {
-			logger.default.error("To call a peer, you must provide a stream from your browser's `getUserMedia`.");
+			Logger.error("To call a peer, you must provide a stream from your browser's `getUserMedia`.");
 			return;
 		}
 		options._stream = stream;
@@ -392,7 +393,7 @@ const Peer = (function (_super) {
 
 	/** Add a data/media connection to this peer. */
 	Peer.prototype._addConnection = function (peerId, connection) {
-		logger.default.log("add connection " + connection.type + ":" + connection.connectionId + " to peerId:" + peerId);
+		Logger.log("add connection " + connection.type + ":" + connection.connectionId + " to peerId:" + peerId);
 		if (!this._connections.has(peerId)) {
 			this._connections.set(peerId, []);
 		}
@@ -420,7 +421,7 @@ const Peer = (function (_super) {
 			return null;
 		}
 		try {
-			for (var connections_1 = util.__values(connections), connections_1_1 = connections_1.next(); !connections_1_1.done; connections_1_1 = connections_1.next()) {
+			for (var connections_1 = Utils.__values(connections), connections_1_1 = connections_1.next(); !connections_1_1.done; connections_1_1 = connections_1.next()) {
 				var connection = connections_1_1.value;
 				if (connection.connectionId === connectionId) {
 					return connection;
@@ -450,7 +451,7 @@ const Peer = (function (_super) {
 	 * it retains its disconnected state and its existing connections.
 	 */
 	Peer.prototype._abort = function (type, message) {
-		logger.default.error("Aborting!");
+		Logger.error("Aborting!");
 		this.emitError(type, message);
 		if (!this._lastServerId) {
 			this.destroy();
@@ -462,7 +463,7 @@ const Peer = (function (_super) {
 
 	/** Emits a typed error message. */
 	Peer.prototype.emitError = function (type, err) {
-		logger.default.error("Error:", err);
+		Logger.error("Error:", err);
 		var error;
 		if (typeof err === "string") {
 			error = new Error(err);
@@ -484,7 +485,7 @@ const Peer = (function (_super) {
 		if (this.destroyed) {
 			return;
 		}
-		logger.default.log("Destroy peer with ID:" + this.id);
+		Logger.log("Destroy peer with ID:" + this.id);
 		this.disconnect();
 		this._cleanup();
 		this._destroyed = true;
@@ -495,7 +496,7 @@ const Peer = (function (_super) {
 	Peer.prototype._cleanup = function () {
 		var e_4, _a;
 		try {
-			for (var _b = util.__values(this._connections.keys()), _c = _b.next(); !_c.done; _c = _b.next()) {
+			for (var _b = Utils.__values(this._connections.keys()), _c = _b.next(); !_c.done; _c = _b.next()) {
 				var peerId = _c.value;
 				this._cleanupPeer(peerId);
 				this._connections.delete(peerId);
@@ -518,7 +519,7 @@ const Peer = (function (_super) {
 		if (!connections)
 			return;
 		try {
-			for (var connections_2 = util.__values(connections), connections_2_1 = connections_2.next(); !connections_2_1.done; connections_2_1 = connections_2.next()) {
+			for (var connections_2 = Utils.__values(connections), connections_2_1 = connections_2.next(); !connections_2_1.done; connections_2_1 = connections_2.next()) {
 				var connection = connections_2_1.value;
 				connection.close();
 			}
@@ -543,7 +544,7 @@ const Peer = (function (_super) {
 			return;
 		}
 		var currentId = this.id;
-		logger.default.log("Disconnect peer with ID:" + currentId);
+		Logger.log("Disconnect peer with ID:" + currentId);
 		this._disconnected = true;
 		this._open = false;
 		this.socket.close();
@@ -555,7 +556,7 @@ const Peer = (function (_super) {
 	/** Attempts to reconnect with the same ID. */
 	Peer.prototype.reconnect = function () {
 		if (this.disconnected && !this.destroyed) {
-			logger.default.log("Attempting reconnection to server with ID " + this._lastServerId);
+			Logger.log("Attempting reconnection to server with ID " + this._lastServerId);
 			this._disconnected = false;
 			this._initialize(this._lastServerId);
 		}
@@ -564,7 +565,7 @@ const Peer = (function (_super) {
 		}
 		else if (!this.disconnected && !this.open) {
 			// Do nothing. We're still connecting the first time.
-			logger.default.error("In a hurry? We're still trying to make the initial connection!");
+			Logger.error("In a hurry? We're still trying to make the initial connection!");
 		}
 		else {
 			throw new Error("Peer " + this.id + " cannot reconnect because it is not disconnected from the server!");

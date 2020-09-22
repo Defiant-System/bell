@@ -499,306 +499,504 @@ Packer.prototype.pack_int64 = function (num) {
 };
 
 const Supports = new (function () {
-    function class_1() {
-        this.isIOS = ['iPad', 'iPhone', 'iPod'].includes("Node");
-        this.supportedBrowsers = ['firefox', 'chrome', 'safari'];
-        this.minFirefoxVersion = 59;
-        this.minChromeVersion = 72;
-        this.minSafariVersion = 605;
-    };
+	function class_1() {
+		this.isIOS = ['iPad', 'iPhone', 'iPod'].includes("Node");
+		this.supportedBrowsers = ['firefox', 'chrome', 'safari'];
+		this.minFirefoxVersion = 59;
+		this.minChromeVersion = 72;
+		this.minSafariVersion = 605;
+	};
 
-    class_1.prototype.isWebRTCSupported = function () {
-        return true;
-    };
-    
-    class_1.prototype.isBrowserSupported = function () {
-        var browser = this.getBrowser();
-        var version = this.getVersion();
-        var validBrowser = this.supportedBrowsers.includes(browser);
-        if (!validBrowser)
-            return false;
-        if (browser === 'chrome')
-            return version >= this.minChromeVersion;
-        if (browser === 'firefox')
-            return version >= this.minFirefoxVersion;
-        if (browser === 'safari')
-            return !this.isIOS && version >= this.minSafariVersion;
-        return false;
-    };
+	class_1.prototype.isWebRTCSupported = function () {
+		return true;
+	};
+	
+	class_1.prototype.isBrowserSupported = function () {
+		var browser = this.getBrowser();
+		var version = this.getVersion();
+		var validBrowser = this.supportedBrowsers.includes(browser);
+		if (!validBrowser)
+			return false;
+		if (browser === 'chrome')
+			return version >= this.minChromeVersion;
+		if (browser === 'firefox')
+			return version >= this.minFirefoxVersion;
+		if (browser === 'safari')
+			return !this.isIOS && version >= this.minSafariVersion;
+		return false;
+	};
 
-    class_1.prototype.getBrowser = function () {
-        return "Node";
-    };
+	class_1.prototype.getBrowser = function () {
+		return "Node";
+	};
 
-    class_1.prototype.getVersion = function () {
-        return 1000 || 0;
-    };
+	class_1.prototype.getVersion = function () {
+		return 1000 || 0;
+	};
 
-    class_1.prototype.isUnifiedPlanSupported = function () {
-        var browser = this.getBrowser();
-        var version = 1000 || 0;
-        if (browser === 'chrome' && version < 72)
-            return false;
-        if (browser === 'firefox' && version >= 59)
-            return true;
-        var tempPc;
-        var supported = false;
-        try {
-            tempPc = new window.RTCPeerConnection();
-            tempPc.addTransceiver('audio');
-            supported = true;
-        }
-        catch (e) { }
-        finally {
-            if (tempPc) {
-                tempPc.close();
-            }
-        }
-        return supported;
-    };
+	class_1.prototype.isUnifiedPlanSupported = function () {
+		var browser = this.getBrowser();
+		var version = 1000 || 0;
+		if (browser === 'chrome' && version < 72)
+			return false;
+		if (browser === 'firefox' && version >= 59)
+			return true;
+		var tempPc;
+		var supported = false;
+		try {
+			tempPc = new window.RTCPeerConnection();
+			tempPc.addTransceiver('audio');
+			supported = true;
+		}
+		catch (e) { }
+		finally {
+			if (tempPc) {
+				tempPc.close();
+			}
+		}
+		return supported;
+	};
 
-    class_1.prototype.toString = function () {
-        return "Supports: \n    browser:" + this.getBrowser() + " \n    version:" + this.getVersion() + " \n    isIOS:" + this.isIOS + " \n    isWebRTCSupported:" + this.isWebRTCSupported() + " \n    isBrowserSupported:" + this.isBrowserSupported() + " \n    isUnifiedPlanSupported:" + this.isUnifiedPlanSupported();
-    };
+	class_1.prototype.toString = function () {
+		return "Supports: \n    browser:" + this.getBrowser() + " \n    version:" + this.getVersion() + " \n    isIOS:" + this.isIOS + " \n    isWebRTCSupported:" + this.isWebRTCSupported() + " \n    isBrowserSupported:" + this.isBrowserSupported() + " \n    isUnifiedPlanSupported:" + this.isUnifiedPlanSupported();
+	};
 
-    return class_1;
+	return class_1;
 }());
 
 const DEFAULT_CONFIG = {
-    iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
-    ],
-    sdpSemantics: "unified-plan"
+	iceServers: [
+		{ urls: "stun:stun.l.google.com:19302" },
+		{ urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
+	],
+	sdpSemantics: "unified-plan"
 };
 
 
 const util = new (function () {
-    function class_1() {
-        this.CLOUD_HOST = "0.peerjs.com";
-        this.CLOUD_PORT = 443;
-        // Browsers that need chunking:
-        this.chunkedBrowsers = { Chrome: 1, chrome: 1 };
-        this.chunkedMTU = 16300; // The original 60000 bytes setting does not work when sending data from Firefox to Chrome, which is "cut off" after 16384 bytes and delivered individually.
-        // Returns browser-agnostic default config
-        this.defaultConfig = DEFAULT_CONFIG;
-        this.browser = Supports.getBrowser();
-        this.browserVersion = Supports.getVersion();
-        // Lists which features are supported
-        this.supports = (function () {
-            var supported = {
-                browser: Supports.isBrowserSupported(),
-                webRTC: Supports.isWebRTCSupported(),
-                audioVideo: false,
-                data: false,
-                binaryBlob: false,
-                reliable: false,
-            };
-            if (!supported.webRTC)
-                return supported;
-            var pc;
-            try {
-                pc = new window.RTCPeerConnection(DEFAULT_CONFIG);
-                supported.audioVideo = true;
-                var dc = void 0;
-                try {
-                    dc = pc.createDataChannel("_PEERJSTEST", { ordered: true });
-                    supported.data = true;
-                    supported.reliable = !!dc.ordered;
-                    // Binary test
-                    try {
-                        dc.binaryType = "blob";
-                        supported.binaryBlob = !Supports.isIOS;
-                    }
-                    catch (e) {
-                    }
-                }
-                catch (e) {
-                }
-                finally {
-                    if (dc) {
-                        dc.close();
-                    }
-                }
-            }
-            catch (e) {
-            }
-            finally {
-                if (pc) {
-                    pc.close();
-                }
-            }
-            return supported;
-        })();
+	function class_1() {
+		this.CLOUD_HOST = "0.peerjs.com";
+		this.CLOUD_PORT = 443;
+		// Browsers that need chunking:
+		this.chunkedBrowsers = { Chrome: 1, chrome: 1 };
+		this.chunkedMTU = 16300; // The original 60000 bytes setting does not work when sending data from Firefox to Chrome, which is "cut off" after 16384 bytes and delivered individually.
+		// Returns browser-agnostic default config
+		this.defaultConfig = DEFAULT_CONFIG;
+		this.browser = Supports.getBrowser();
+		this.browserVersion = Supports.getVersion();
+		// Lists which features are supported
+		this.supports = (function () {
+			var supported = {
+				browser: Supports.isBrowserSupported(),
+				webRTC: Supports.isWebRTCSupported(),
+				audioVideo: false,
+				data: false,
+				binaryBlob: false,
+				reliable: false,
+			};
+			if (!supported.webRTC)
+				return supported;
+			var pc;
+			try {
+				pc = new window.RTCPeerConnection(DEFAULT_CONFIG);
+				supported.audioVideo = true;
+				var dc = void 0;
+				try {
+					dc = pc.createDataChannel("_PEERJSTEST", { ordered: true });
+					supported.data = true;
+					supported.reliable = !!dc.ordered;
+					// Binary test
+					try {
+						dc.binaryType = "blob";
+						supported.binaryBlob = !Supports.isIOS;
+					}
+					catch (e) {
+					}
+				}
+				catch (e) {
+				}
+				finally {
+					if (dc) {
+						dc.close();
+					}
+				}
+			}
+			catch (e) {
+			}
+			finally {
+				if (pc) {
+					pc.close();
+				}
+			}
+			return supported;
+		})();
 
-        this.pack = BinaryPack.pack;
-        this.unpack = BinaryPack.unpack;
-        // Binary stuff
-        this._dataCount = 1;
-    }
+		this.pack = BinaryPack.pack;
+		this.unpack = BinaryPack.unpack;
+		// Binary stuff
+		this._dataCount = 1;
+	}
 
-    class_1.prototype.noop = function () { };
+	class_1.prototype.noop = function () { };
 
-    // Ensure alphanumeric ids
-    class_1.prototype.validateId = function (id) {
-        // Allow empty ids
-        return !id || /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(id);
-    };
+	// Ensure alphanumeric ids
+	class_1.prototype.validateId = function (id) {
+		// Allow empty ids
+		return !id || /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(id);
+	};
 
-    class_1.prototype.chunk = function (blob) {
-        var chunks = [];
-        var size = blob.size;
-        var total = Math.ceil(size / exports.util.chunkedMTU);
-        var index = 0;
-        var start = 0;
-        while (start < size) {
-            var end = Math.min(size, start + exports.util.chunkedMTU);
-            var b = blob.slice(start, end);
-            var chunk = {
-                __peerData: this._dataCount,
-                n: index,
-                data: b,
-                total: total,
-            };
-            chunks.push(chunk);
-            start = end;
-            index++;
-        }
-        this._dataCount++;
-        return chunks;
-    };
+	class_1.prototype.chunk = function (blob) {
+		var chunks = [];
+		var size = blob.size;
+		var total = Math.ceil(size / exports.util.chunkedMTU);
+		var index = 0;
+		var start = 0;
+		while (start < size) {
+			var end = Math.min(size, start + exports.util.chunkedMTU);
+			var b = blob.slice(start, end);
+			var chunk = {
+				__peerData: this._dataCount,
+				n: index,
+				data: b,
+				total: total,
+			};
+			chunks.push(chunk);
+			start = end;
+			index++;
+		}
+		this._dataCount++;
+		return chunks;
+	};
 
-    class_1.prototype.blobToArrayBuffer = function (blob, cb) {
-        var fr = new window.FileReader();
-        fr.onload = function (evt) {
-            if (evt.target) {
-                cb(evt.target.result);
-            }
-        };
-        fr.readAsArrayBuffer(blob);
-        return fr;
-    };
+	class_1.prototype.blobToArrayBuffer = function (blob, cb) {
+		var fr = new window.FileReader();
+		fr.onload = function (evt) {
+			if (evt.target) {
+				cb(evt.target.result);
+			}
+		};
+		fr.readAsArrayBuffer(blob);
+		return fr;
+	};
 
-    class_1.prototype.binaryStringToArrayBuffer = function (binary) {
-        var byteArray = new Uint8Array(binary.length);
-        for (var i = 0; i < binary.length; i++) {
-            byteArray[i] = binary.charCodeAt(i) & 0xff;
-        }
-        return byteArray.buffer;
-    };
+	class_1.prototype.binaryStringToArrayBuffer = function (binary) {
+		var byteArray = new Uint8Array(binary.length);
+		for (var i = 0; i < binary.length; i++) {
+			byteArray[i] = binary.charCodeAt(i) & 0xff;
+		}
+		return byteArray.buffer;
+	};
 
-    class_1.prototype.randomToken = function () {
-        return Math.random()
-            .toString(36)
-            .substr(2);
-    };
+	class_1.prototype.randomToken = function () {
+		return Math.random()
+			.toString(36)
+			.substr(2);
+	};
 
-    class_1.prototype.isSecure = function () {
-        return true;
-    };
+	class_1.prototype.isSecure = function () {
+		return true;
+	};
 
-    return class_1;
+	return class_1;
 }());
 
 
 
 var __awaiter = function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+	function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+	return new (P || (P = Promise))(function (resolve, reject) {
+		function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+		function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+		function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+		step((generator = generator.apply(thisArg, _arguments || [])).next());
+	});
 };
 
 var __generator = function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
+	var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	function verb(n) { return function (v) { return step([n, v]); }; }
+	function step(op) {
+		if (f) throw new TypeError("Generator is already executing.");
+		while (_) try {
+			if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+			if (y = 0, t) op = [op[0] & 2, t.value];
+			switch (op[0]) {
+				case 0: case 1: t = op; break;
+				case 4: _.label++; return { value: op[1], done: false };
+				case 5: _.label++; y = op[1]; op = [0]; continue;
+				case 7: op = _.ops.pop(); _.trys.pop(); continue;
+				default:
+					if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+					if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+					if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+					if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+					if (t[2]) _.ops.pop();
+					_.trys.pop(); continue;
+			}
+			op = body.call(thisArg, _);
+		} catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+		if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	}
 };
 
 var __extends = (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	};
+	return function (d, b) {
+		extendStatics(d, b);
+		function __() { this.constructor = d; }
+		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 })();
 
 var __read = function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
+	var m = typeof Symbol === "function" && o[Symbol.iterator];
+	if (!m) return o;
+	var i = m.call(o), r, ar = [], e;
+	try {
+		while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+	}
+	catch (error) { e = { error: error }; }
+	finally {
+		try {
+			if (r && !r.done && (m = i["return"])) m.call(i);
+		}
+		finally { if (e) throw e.error; }
+	}
+	return ar;
 };
 
 var __spread = function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+	for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+	return ar;
 };
 
 var __values = function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+	var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+	if (m) return m.call(o);
+	if (o && typeof o.length === "number") return {
+		next: function () {
+			if (o && i >= o.length) o = void 0;
+			return { value: o && o[i++], done: !o };
+		}
+	};
+	throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 
 var __assign = function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
+	__assign = Object.assign || function(t) {
+		for (var s, i = 1, n = arguments.length; i < n; i++) {
+			s = arguments[i];
+			for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+				t[p] = s[p];
+		}
+		return t;
+	};
+	return __assign.apply(this, arguments);
 };
+
+var LOG_PREFIX = 'PeerJS: ';
+/*
+Prints log messages depending on the debug level passed in. Defaults to 0.
+0  Prints no logs.
+1  Prints only errors.
+2  Prints errors and warnings.
+3  Prints all logs.
+*/
+var LogLevel = {
+	"0": "Disabled",
+	"1": "Errors",
+	"2": "Warnings",
+	"3": "All",
+	"Disabled": "0",
+	"Errors": "1",
+	"Warnings": "2",
+	"All": "3",
+};
+
+var LoggerClass = (function () {
+
+	function Logger() {
+		this._logLevel = LogLevel.Disabled;
+	}
+
+	Object.defineProperty(Logger.prototype, "logLevel", {
+		get: function () { return this._logLevel; },
+		set: function (logLevel) { this._logLevel = logLevel; },
+		enumerable: true,
+		configurable: true
+	});
+
+	Logger.prototype.log = function () {
+		var args = [];
+		for (var _i = 0; _i < arguments.length; _i++) {
+			args[_i] = arguments[_i];
+		}
+		if (this._logLevel >= LogLevel.All) {
+			this._print.apply(this, __spread([LogLevel.All], args));
+		}
+	};
+
+	Logger.prototype.warn = function () {
+		var args = [];
+		for (var _i = 0; _i < arguments.length; _i++) {
+			args[_i] = arguments[_i];
+		}
+		if (this._logLevel >= LogLevel.Warnings) {
+			this._print.apply(this, __spread([LogLevel.Warnings], args));
+		}
+	};
+
+	Logger.prototype.error = function () {
+		var args = [];
+		for (var _i = 0; _i < arguments.length; _i++) {
+			args[_i] = arguments[_i];
+		}
+		if (this._logLevel >= LogLevel.Errors) {
+			this._print.apply(this, __spread([LogLevel.Errors], args));
+		}
+	};
+
+	Logger.prototype.setLogFunction = function (fn) {
+		this._print = fn;
+	};
+
+	Logger.prototype._print = function (logLevel) {
+		var rest = [];
+		for (var _i = 1; _i < arguments.length; _i++) {
+			rest[_i - 1] = arguments[_i];
+		}
+		var copy = __spread([LOG_PREFIX], rest);
+		for (var i in copy) {
+			if (copy[i] instanceof Error) {
+				copy[i] = "(" + copy[i].name + ") " + copy[i].message;
+			}
+		}
+		if (logLevel >= LogLevel.All) {
+			console.log.apply(console, __spread(copy));
+		}
+		else if (logLevel >= LogLevel.Warnings) {
+			console.warn.apply(console, __spread(["WARNING"], copy));
+		}
+		else if (logLevel >= LogLevel.Errors) {
+			console.error.apply(console, __spread(["ERROR"], copy));
+		}
+	};
+
+	return Logger;
+
+}());
+
+let Logger = new LoggerClass();
+
+var API = (function () {
+
+	function API(_options) {
+		this._options = _options;
+	}
+
+	API.prototype._buildUrl = function (method) {
+		var protocol = this._options.secure ? "https://" : "http://";
+		var url = protocol +
+			this._options.host +
+			":" +
+			this._options.port +
+			this._options.path +
+			this._options.key +
+			"/" +
+			method;
+		var queryString = "?ts=" + new Date().getTime() + "" + Math.random();
+		url += queryString;
+		return url;
+	};
+
+	/** Get a unique ID from the server via XHR and initialize with it. */
+	API.prototype.retrieveId = function () {
+		return __awaiter(this, void 0, void 0, function () {
+			var url, response, error_1, pathError;
+			return __generator(this, function (_a) {
+				switch (_a.label) {
+					case 0:
+						url = this._buildUrl("id");
+						_a.label = 1;
+					case 1:
+						_a.trys.push([1, 3, , 4]);
+						return [4 /*yield*/, window.fetch(url)];
+					case 2:
+						response = _a.sent();
+						if (response.status !== 200) {
+							throw new Error("Error. Status:" + response.status);
+						}
+						return [2 /*return*/, response.text()];
+					case 3:
+						error_1 = _a.sent();
+						Logger.error("Error retrieving ID", error_1);
+						pathError = "";
+						if (this._options.path === "/" &&
+							this._options.host !== util.CLOUD_HOST) {
+							pathError =
+								" If you passed in a `path` to your self-hosted PeerServer, " +
+									"you'll also need to pass in that same path when creating a new " +
+									"Peer.";
+						}
+						throw new Error("Could not get an ID from the server." + pathError);
+					case 4: return [2 /*return*/];
+				}
+			});
+		});
+	};
+
+	/** @deprecated */
+	API.prototype.listAllPeers = function () {
+		return __awaiter(this, void 0, void 0, function () {
+			var url, response, helpfulError, error_2;
+			return __generator(this, function (_a) {
+				switch (_a.label) {
+					case 0:
+						url = this._buildUrl("peers");
+						_a.label = 1;
+					case 1:
+						_a.trys.push([1, 3, , 4]);
+						return [4 /*yield*/, window.fetch(url)];
+					case 2:
+						response = _a.sent();
+						if (response.status !== 200) {
+							if (response.status === 401) {
+								helpfulError = "";
+								if (this._options.host === util.CLOUD_HOST) {
+									helpfulError =
+										"It looks like you're using the cloud server. You can email " +
+											"team@peerjs.com to enable peer listing for your API key.";
+								}
+								else {
+									helpfulError =
+										"You need to enable `allow_discovery` on your self-hosted " +
+											"PeerServer to use this feature.";
+								}
+								throw new Error("It doesn't look like you have permission to list peers IDs. " +
+									helpfulError);
+							}
+							throw new Error("Error. Status:" + response.status);
+						}
+						return [2 /*return*/, response.json()];
+					case 3:
+						error_2 = _a.sent();
+						Logger.error("Error retrieving list peers", error_2);
+						throw new Error("Could not get list peers from the server." + error_2);
+					case 4: return [2 /*return*/];
+				}
+			});
+		});
+	};
+
+	return API;
+
+}());
 
 var has = Object.prototype.hasOwnProperty
 	, prefix = '~';
@@ -1128,182 +1326,68 @@ EventEmitter.prefixed = prefix;
 //
 EventEmitter.EventEmitter = EventEmitter;
 
-var LOG_PREFIX = 'PeerJS: ';
-/*
-Prints log messages depending on the debug level passed in. Defaults to 0.
-0  Prints no logs.
-1  Prints only errors.
-2  Prints errors and warnings.
-3  Prints all logs.
-*/
-var LogLevel;
-
-(function (LogLevel) {
-    LogLevel[LogLevel["Disabled"] = 0] = "Disabled";
-    LogLevel[LogLevel["Errors"] = 1] = "Errors";
-    LogLevel[LogLevel["Warnings"] = 2] = "Warnings";
-    LogLevel[LogLevel["All"] = 3] = "All";
-})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
-
-var Logger = (function () {
-
-    var __read = function (o, n) {
-        var m = typeof Symbol === "function" && o[Symbol.iterator];
-        if (!m) return o;
-        var i = m.call(o), r, ar = [], e;
-        try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-        }
-        catch (error) { e = { error: error }; }
-        finally {
-            try {
-                if (r && !r.done && (m = i["return"])) m.call(i);
-            }
-            finally { if (e) throw e.error; }
-        }
-        return ar;
-    };
-
-    var __spread = function () {
-        for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-        return ar;
-    };
-
-    function Logger() {
-        this._logLevel = LogLevel.Disabled;
-    }
-
-    Object.defineProperty(Logger.prototype, "logLevel", {
-        get: function () { return this._logLevel; },
-        set: function (logLevel) { this._logLevel = logLevel; },
-        enumerable: true,
-        configurable: true
-    });
-
-    Logger.prototype.log = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (this._logLevel >= LogLevel.All) {
-            this._print.apply(this, __spread([LogLevel.All], args));
-        }
-    };
-
-    Logger.prototype.warn = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (this._logLevel >= LogLevel.Warnings) {
-            this._print.apply(this, __spread([LogLevel.Warnings], args));
-        }
-    };
-
-    Logger.prototype.error = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (this._logLevel >= LogLevel.Errors) {
-            this._print.apply(this, __spread([LogLevel.Errors], args));
-        }
-    };
-
-    Logger.prototype.setLogFunction = function (fn) {
-        this._print = fn;
-    };
-
-    Logger.prototype._print = function (logLevel) {
-        var rest = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            rest[_i - 1] = arguments[_i];
-        }
-        var copy = __spread([LOG_PREFIX], rest);
-        for (var i in copy) {
-            if (copy[i] instanceof Error) {
-                copy[i] = "(" + copy[i].name + ") " + copy[i].message;
-            }
-        }
-        if (logLevel >= LogLevel.All) {
-            console.log.apply(console, __spread(copy));
-        }
-        else if (logLevel >= LogLevel.Warnings) {
-            console.warn.apply(console, __spread(["WARNING"], copy));
-        }
-        else if (logLevel >= LogLevel.Errors) {
-            console.error.apply(console, __spread(["ERROR"], copy));
-        }
-    };
-
-    return Logger;
-
-}());
-
-const logger = new Logger();
-
 const ConnectionEventType = {
-    Open: "open",
-    Stream: "stream",
-    Data: "data",
-    Close: "close",
-    Error: "error",
-    IceStateChanged: "iceStateChanged",
+	Open: "open",
+	Stream: "stream",
+	Data: "data",
+	Close: "close",
+	Error: "error",
+	IceStateChanged: "iceStateChanged",
 };
 
 const ConnectionType = {
-    Data: "data",
-    Media: "media",
+	Data: "data",
+	Media: "media",
 };
 
 const PeerEventType = {
-    Open: "open",
-    Close: "close",
-    Connection: "connection",
-    Call: "call",
-    Disconnected: "disconnected",
-    Error: "error",
+	Open: "open",
+	Close: "close",
+	Connection: "connection",
+	Call: "call",
+	Disconnected: "disconnected",
+	Error: "error",
 };
 
 const PeerErrorType = {
-    BrowserIncompatible: "browser-incompatible",
-    Disconnected: "disconnected",
-    InvalidID: "invalid-id",
-    InvalidKey: "invalid-key",
-    Network: "network",
-    PeerUnavailable: "peer-unavailable",
-    SslUnavailable: "ssl-unavailable",
-    ServerError: "server-error",
-    SocketError: "socket-error",
-    SocketClosed: "socket-closed",
-    UnavailableID: "unavailable-id",
-    WebRTC: "webrtc",
+	BrowserIncompatible: "browser-incompatible",
+	Disconnected: "disconnected",
+	InvalidID: "invalid-id",
+	InvalidKey: "invalid-key",
+	Network: "network",
+	PeerUnavailable: "peer-unavailable",
+	SslUnavailable: "ssl-unavailable",
+	ServerError: "server-error",
+	SocketError: "socket-error",
+	SocketClosed: "socket-closed",
+	UnavailableID: "unavailable-id",
+	WebRTC: "webrtc",
 };
 
 const SerializationType = {
-    Binary: "binary",
-    BinaryUTF8: "binary-utf8",
-    JSON: "json",
+	Binary: "binary",
+	BinaryUTF8: "binary-utf8",
+	JSON: "json",
 };
 
 const SocketEventType = {
-    Message: "message",
-    Disconnected: "disconnected",
-    Error: "error",
-    Close: "close",
+	Message: "message",
+	Disconnected: "disconnected",
+	Error: "error",
+	Close: "close",
 };
 
 const ServerMessageType = {
-    Heartbeat: "HEARTBEAT",
-    Candidate: "CANDIDATE",
-    Offer: "OFFER",
-    Answer: "ANSWER",
-    Open: "OPEN",
-    Error: "ERROR",
-    IdTaken: "ID-TAKEN",
-    InvalidKey: "INVALID-KEY",
-    Leave: "LEAVE",
-    Expire: "EXPIRE",
+	Heartbeat: "HEARTBEAT",
+	Candidate: "CANDIDATE",
+	Offer: "OFFER",
+	Answer: "ANSWER",
+	Open: "OPEN",
+	Error: "ERROR",
+	IdTaken: "ID-TAKEN",
+	InvalidKey: "INVALID-KEY",
+	Leave: "LEAVE",
+	Expire: "EXPIRE",
 };
 
 /**
@@ -1311,147 +1395,147 @@ const ServerMessageType = {
  * possible connection for peers.
  */
 var Socket = (function (_super) {
-    
-    __extends(Socket, _super);
+	
+	__extends(Socket, _super);
 
-    function Socket(secure, host, port, path, key, pingInterval) {
-        if (pingInterval === void 0) { pingInterval = 5000; }
-        var _this = _super.call(this) || this;
-        _this.pingInterval = pingInterval;
-        _this._disconnected = true;
-        _this._messagesQueue = [];
-        var wsProtocol = secure ? "wss://" : "ws://";
-        _this._baseUrl = wsProtocol + host + ":" + port + path + "peerjs?key=" + key;
-        return _this;
-    }
+	function Socket(secure, host, port, path, key, pingInterval) {
+		if (pingInterval === void 0) { pingInterval = 5000; }
+		var _this = _super.call(this) || this;
+		_this.pingInterval = pingInterval;
+		_this._disconnected = true;
+		_this._messagesQueue = [];
+		var wsProtocol = secure ? "wss://" : "ws://";
+		_this._baseUrl = wsProtocol + host + ":" + port + path + "peerjs?key=" + key;
+		return _this;
+	}
 
-    Socket.prototype.start = function (id, token) {
-        var _this = this;
-        this._id = id;
-        var wsUrl = this._baseUrl + "&id=" + id + "&token=" + token;
-        if (!!this._socket || !this._disconnected) {
-            return;
-        }
-        this._socket = new WebSocket(wsUrl);
-        this._disconnected = false;
-        this._socket.onmessage = function (event) {
-            var data;
-            try {
-                //@ts-ignore
-                data = JSON.parse(event.data);
-                logger.default.log("Server message received:", data);
-            }
-            catch (e) {
-                logger.default.log("Invalid server message", event.data);
-                return;
-            }
-            _this.emit(SocketEventType.Message, data);
-        };
-        this._socket.onclose = function (event) {
-            if (_this._disconnected) {
-                return;
-            }
-            logger.default.log("Socket closed.", event);
-            _this._cleanup();
-            _this._disconnected = true;
-            _this.emit(SocketEventType.Disconnected);
-        };
-        // Take care of the queue of connections if necessary and make sure Peer knows
-        // socket is open.
-        this._socket.onopen = function () {
-            if (_this._disconnected) {
-                return;
-            }
-            _this._sendQueuedMessages();
-            logger.default.log("Socket open");
-            _this._scheduleHeartbeat();
-        };
-    };
+	Socket.prototype.start = function (id, token) {
+		var _this = this;
+		this._id = id;
+		var wsUrl = this._baseUrl + "&id=" + id + "&token=" + token;
+		if (!!this._socket || !this._disconnected) {
+			return;
+		}
+		this._socket = new WebSocket(wsUrl);
+		this._disconnected = false;
+		this._socket.onmessage = function (event) {
+			var data;
+			try {
+				//@ts-ignore
+				data = JSON.parse(event.data);
+				Logger.log("Server message received:", data);
+			}
+			catch (e) {
+				Logger.log("Invalid server message", event.data);
+				return;
+			}
+			_this.emit(SocketEventType.Message, data);
+		};
+		this._socket.onclose = function (event) {
+			if (_this._disconnected) {
+				return;
+			}
+			Logger.log("Socket closed.", event);
+			_this._cleanup();
+			_this._disconnected = true;
+			_this.emit(SocketEventType.Disconnected);
+		};
+		// Take care of the queue of connections if necessary and make sure Peer knows
+		// socket is open.
+		this._socket.onopen = function () {
+			if (_this._disconnected) {
+				return;
+			}
+			_this._sendQueuedMessages();
+			Logger.log("Socket open");
+			_this._scheduleHeartbeat();
+		};
+	};
 
-    Socket.prototype._scheduleHeartbeat = function () {
-        var _this = this;
-        this._wsPingTimer = setTimeout(function () {
-            _this._sendHeartbeat();
-        }, this.pingInterval);
-    };
+	Socket.prototype._scheduleHeartbeat = function () {
+		var _this = this;
+		this._wsPingTimer = setTimeout(function () {
+			_this._sendHeartbeat();
+		}, this.pingInterval);
+	};
 
-    Socket.prototype._sendHeartbeat = function () {
-        if (!this._wsOpen()) {
-            logger.default.log("Cannot send heartbeat, because socket closed");
-            return;
-        }
-        var message = JSON.stringify({ type: ServerMessageType.Heartbeat });
-        this._socket.send(message);
-        this._scheduleHeartbeat();
-    };
+	Socket.prototype._sendHeartbeat = function () {
+		if (!this._wsOpen()) {
+			Logger.log("Cannot send heartbeat, because socket closed");
+			return;
+		}
+		var message = JSON.stringify({ type: ServerMessageType.Heartbeat });
+		this._socket.send(message);
+		this._scheduleHeartbeat();
+	};
 
-    /** Is the websocket currently open? */
-    Socket.prototype._wsOpen = function () {
-        return !!this._socket && this._socket.readyState === 1;
-    };
+	/** Is the websocket currently open? */
+	Socket.prototype._wsOpen = function () {
+		return !!this._socket && this._socket.readyState === 1;
+	};
 
-    /** Send queued messages. */
-    Socket.prototype._sendQueuedMessages = function () {
-        var e_1, _a;
-        //Create copy of queue and clear it,
-        //because send method push the message back to queue if smth will go wrong
-        var copiedQueue = __spread(this._messagesQueue);
-        this._messagesQueue = [];
-        try {
-            for (var copiedQueue_1 = __values(copiedQueue), copiedQueue_1_1 = copiedQueue_1.next(); !copiedQueue_1_1.done; copiedQueue_1_1 = copiedQueue_1.next()) {
-                var message = copiedQueue_1_1.value;
-                this.send(message);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (copiedQueue_1_1 && !copiedQueue_1_1.done && (_a = copiedQueue_1.return)) _a.call(copiedQueue_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-    };
+	/** Send queued messages. */
+	Socket.prototype._sendQueuedMessages = function () {
+		var e_1, _a;
+		//Create copy of queue and clear it,
+		//because send method push the message back to queue if smth will go wrong
+		var copiedQueue = __spread(this._messagesQueue);
+		this._messagesQueue = [];
+		try {
+			for (var copiedQueue_1 = __values(copiedQueue), copiedQueue_1_1 = copiedQueue_1.next(); !copiedQueue_1_1.done; copiedQueue_1_1 = copiedQueue_1.next()) {
+				var message = copiedQueue_1_1.value;
+				this.send(message);
+			}
+		}
+		catch (e_1_1) { e_1 = { error: e_1_1 }; }
+		finally {
+			try {
+				if (copiedQueue_1_1 && !copiedQueue_1_1.done && (_a = copiedQueue_1.return)) _a.call(copiedQueue_1);
+			}
+			finally { if (e_1) throw e_1.error; }
+		}
+	};
 
-    /** Exposed send for DC & Peer. */
-    Socket.prototype.send = function (data) {
-        if (this._disconnected) {
-            return;
-        }
-        // If we didn't get an ID yet, we can't yet send anything so we should queue
-        // up these messages.
-        if (!this._id) {
-            this._messagesQueue.push(data);
-            return;
-        }
-        if (!data.type) {
-            this.emit(SocketEventType.Error, "Invalid message");
-            return;
-        }
-        if (!this._wsOpen()) {
-            return;
-        }
-        var message = JSON.stringify(data);
-        this._socket.send(message);
-    };
+	/** Exposed send for DC & Peer. */
+	Socket.prototype.send = function (data) {
+		if (this._disconnected) {
+			return;
+		}
+		// If we didn't get an ID yet, we can't yet send anything so we should queue
+		// up these messages.
+		if (!this._id) {
+			this._messagesQueue.push(data);
+			return;
+		}
+		if (!data.type) {
+			this.emit(SocketEventType.Error, "Invalid message");
+			return;
+		}
+		if (!this._wsOpen()) {
+			return;
+		}
+		var message = JSON.stringify(data);
+		this._socket.send(message);
+	};
 
-    Socket.prototype.close = function () {
-        if (this._disconnected) {
-            return;
-        }
-        this._cleanup();
-        this._disconnected = true;
-    };
+	Socket.prototype.close = function () {
+		if (this._disconnected) {
+			return;
+		}
+		this._cleanup();
+		this._disconnected = true;
+	};
 
-    Socket.prototype._cleanup = function () {
-        if (!!this._socket) {
-            this._socket.onopen = this._socket.onmessage = this._socket.onclose = null;
-            this._socket.close();
-            this._socket = undefined;
-        }
-        clearTimeout(this._wsPingTimer);
-    };
+	Socket.prototype._cleanup = function () {
+		if (!!this._socket) {
+			this._socket.onopen = this._socket.onmessage = this._socket.onclose = null;
+			this._socket.close();
+			this._socket = undefined;
+		}
+		clearTimeout(this._wsPingTimer);
+	};
 
-    return Socket;
+	return Socket;
 
 }(EventEmitter));
 
@@ -1489,7 +1573,7 @@ var Negotiator = (function () {
 
 	/** Start a PC. */
 	Negotiator.prototype._startPeerConnection = function () {
-		logger.default.log("Creating RTCPeerConnection.");
+		Logger.log("Creating RTCPeerConnection.");
 		var peerConnection = new RTCPeerConnection(this.connection.provider.options.config);
 		this._setupListeners(peerConnection);
 		return peerConnection;
@@ -1503,11 +1587,11 @@ var Negotiator = (function () {
 		var connectionType = this.connection.type;
 		var provider = this.connection.provider;
 		// ICE CANDIDATES.
-		logger.default.log("Listening for ICE candidates.");
+		Logger.log("Listening for ICE candidates.");
 		peerConnection.onicecandidate = function (evt) {
 			if (!evt.candidate || !evt.candidate.candidate)
 				return;
-			logger.default.log("Received ICE candidates for " + peerId + ":", evt.candidate);
+			Logger.log("Received ICE candidates for " + peerId + ":", evt.candidate);
 			provider.socket.send({
 				type: ServerMessageType.Candidate,
 				payload: {
@@ -1521,19 +1605,19 @@ var Negotiator = (function () {
 		peerConnection.oniceconnectionstatechange = function () {
 			switch (peerConnection.iceConnectionState) {
 				case "failed":
-					logger.default.log("iceConnectionState is failed, closing connections to " +
+					Logger.log("iceConnectionState is failed, closing connections to " +
 						peerId);
 					_this.connection.emit(ConnectionEventType.Error, new Error("Negotiation of connection to " + peerId + " failed."));
 					_this.connection.close();
 					break;
 				case "closed":
-					logger.default.log("iceConnectionState is closed, closing connections to " +
+					Logger.log("iceConnectionState is closed, closing connections to " +
 						peerId);
 					_this.connection.emit(ConnectionEventType.Error, new Error("Connection to " + peerId + " closed."));
 					_this.connection.close();
 					break;
 				case "disconnected":
-					logger.default.log("iceConnectionState is disconnected, closing connections to " +
+					Logger.log("iceConnectionState is disconnected, closing connections to " +
 						peerId);
 					_this.connection.emit(ConnectionEventType.Error, new Error("Connection to " + peerId + " disconnected."));
 					_this.connection.close();
@@ -1545,19 +1629,19 @@ var Negotiator = (function () {
 			_this.connection.emit(ConnectionEventType.IceStateChanged, peerConnection.iceConnectionState);
 		};
 		// DATACONNECTION.
-		logger.default.log("Listening for data channel");
+		Logger.log("Listening for data channel");
 		// Fired between offer and answer, so options should already be saved
 		// in the options hash.
 		peerConnection.ondatachannel = function (evt) {
-			logger.default.log("Received data channel");
+			Logger.log("Received data channel");
 			var dataChannel = evt.channel;
 			var connection = (provider.getConnection(peerId, connectionId));
 			connection.initialize(dataChannel);
 		};
 		// MEDIACONNECTION.
-		logger.default.log("Listening for remote stream");
+		Logger.log("Listening for remote stream");
 		peerConnection.ontrack = function (evt) {
-			logger.default.log("Received remote stream");
+			Logger.log("Received remote stream");
 			var stream = evt.streams[0];
 			var connection = provider.getConnection(peerId, connectionId);
 			if (connection.type === ConnectionType.Media) {
@@ -1568,7 +1652,7 @@ var Negotiator = (function () {
 	};
 
 	Negotiator.prototype.cleanup = function () {
-		logger.default.log("Cleaning up PeerConnection to " + this.connection.peer);
+		Logger.log("Cleaning up PeerConnection to " + this.connection.peer);
 		var peerConnection = this.connection.peerConnection;
 		if (!peerConnection) {
 			return;
@@ -1604,7 +1688,7 @@ var Negotiator = (function () {
 						return [4 /*yield*/, peerConnection.createOffer(this.connection.options.constraints)];
 					case 2:
 						offer = _a.sent();
-						logger.default.log("Created offer.");
+						Logger.log("Created offer.");
 						if (this.connection.options.sdpTransform && typeof this.connection.options.sdpTransform === 'function') {
 							offer.sdp = this.connection.options.sdpTransform(offer.sdp) || offer.sdp;
 						}
@@ -1614,7 +1698,7 @@ var Negotiator = (function () {
 						return [4 /*yield*/, peerConnection.setLocalDescription(offer)];
 					case 4:
 						_a.sent();
-						logger.default.log("Set localDescription:", offer, "for:" + this.connection.peer);
+						Logger.log("Set localDescription:", offer, "for:" + this.connection.peer);
 						payload = {
 							sdp: offer,
 							type: this.connection.type,
@@ -1638,14 +1722,14 @@ var Negotiator = (function () {
 						if (err_2 !=
 							"OperationError: Failed to set local offer sdp: Called in wrong state: kHaveRemoteOffer") {
 							provider.emitError(PeerErrorType.WebRTC, err_2);
-							logger.default.log("Failed to setLocalDescription, ", err_2);
+							Logger.log("Failed to setLocalDescription, ", err_2);
 						}
 						return [3 /*break*/, 6];
 					case 6: return [3 /*break*/, 8];
 					case 7:
 						err_1_1 = _a.sent();
 						provider.emitError(PeerErrorType.WebRTC, err_1_1);
-						logger.default.log("Failed to createOffer, ", err_1_1);
+						Logger.log("Failed to createOffer, ", err_1_1);
 						return [3 /*break*/, 8];
 					case 8: return [2 /*return*/];
 				}
@@ -1667,7 +1751,7 @@ var Negotiator = (function () {
 						return [4 /*yield*/, peerConnection.createAnswer()];
 					case 2:
 						answer = _a.sent();
-						logger.default.log("Created answer.");
+						Logger.log("Created answer.");
 						if (this.connection.options.sdpTransform && typeof this.connection.options.sdpTransform === 'function') {
 							answer.sdp = this.connection.options.sdpTransform(answer.sdp) || answer.sdp;
 						}
@@ -1677,7 +1761,7 @@ var Negotiator = (function () {
 						return [4 /*yield*/, peerConnection.setLocalDescription(answer)];
 					case 4:
 						_a.sent();
-						logger.default.log("Set localDescription:", answer, "for:" + this.connection.peer);
+						Logger.log("Set localDescription:", answer, "for:" + this.connection.peer);
 						provider.socket.send({
 							type: ServerMessageType.Answer,
 							payload: {
@@ -1692,13 +1776,13 @@ var Negotiator = (function () {
 					case 5:
 						err_3 = _a.sent();
 						provider.emitError(PeerErrorType.WebRTC, err_3);
-						logger.default.log("Failed to setLocalDescription, ", err_3);
+						Logger.log("Failed to setLocalDescription, ", err_3);
 						return [3 /*break*/, 6];
 					case 6: return [3 /*break*/, 8];
 					case 7:
 						err_1_2 = _a.sent();
 						provider.emitError(PeerErrorType.WebRTC, err_1_2);
-						logger.default.log("Failed to create answer, ", err_1_2);
+						Logger.log("Failed to create answer, ", err_1_2);
 						return [3 /*break*/, 8];
 					case 8: return [2 /*return*/];
 				}
@@ -1716,7 +1800,7 @@ var Negotiator = (function () {
 						sdp = new RTCSessionDescription(sdp);
 						peerConnection = this.connection.peerConnection;
 						provider = this.connection.provider;
-						logger.default.log("Setting remote description", sdp);
+						Logger.log("Setting remote description", sdp);
 						self = this;
 						_a.label = 1;
 					case 1:
@@ -1724,7 +1808,7 @@ var Negotiator = (function () {
 						return [4 /*yield*/, peerConnection.setRemoteDescription(sdp)];
 					case 2:
 						_a.sent();
-						logger.default.log("Set remoteDescription:" + type + " for:" + this.connection.peer);
+						Logger.log("Set remoteDescription:" + type + " for:" + this.connection.peer);
 						if (!(type === "OFFER")) return [3 /*break*/, 4];
 						return [4 /*yield*/, self._makeAnswer()];
 					case 3:
@@ -1734,7 +1818,7 @@ var Negotiator = (function () {
 					case 5:
 						err_4 = _a.sent();
 						provider.emitError(PeerErrorType.WebRTC, err_4);
-						logger.default.log("Failed to setRemoteDescription, ", err_4);
+						Logger.log("Failed to setRemoteDescription, ", err_4);
 						return [3 /*break*/, 6];
 					case 6: return [2 /*return*/];
 				}
@@ -1749,7 +1833,7 @@ var Negotiator = (function () {
 			return __generator(this, function (_a) {
 				switch (_a.label) {
 					case 0:
-						logger.default.log("handleCandidate:", ice);
+						Logger.log("handleCandidate:", ice);
 						candidate = ice.candidate;
 						sdpMLineIndex = ice.sdpMLineIndex;
 						sdpMid = ice.sdpMid;
@@ -1765,12 +1849,12 @@ var Negotiator = (function () {
 							}))];
 					case 2:
 						_a.sent();
-						logger.default.log("Added ICE candidate for:" + this.connection.peer);
+						Logger.log("Added ICE candidate for:" + this.connection.peer);
 						return [3 /*break*/, 4];
 					case 3:
 						err_5 = _a.sent();
 						provider.emitError(PeerErrorType.WebRTC, err_5);
-						logger.default.log("Failed to handleCandidate, ", err_5);
+						Logger.log("Failed to handleCandidate, ", err_5);
 						return [3 /*break*/, 4];
 					case 4: return [2 /*return*/];
 				}
@@ -1779,9 +1863,9 @@ var Negotiator = (function () {
 	};
 
 	Negotiator.prototype._addTracksToConnection = function (stream, peerConnection) {
-		logger.default.log("add tracks from stream " + stream.id + " to peer connection");
+		Logger.log("add tracks from stream " + stream.id + " to peer connection");
 		if (!peerConnection.addTrack) {
-			return logger.default.error("Your browser does't support RTCPeerConnection#addTrack. Ignored.");
+			return Logger.error("Your browser does't support RTCPeerConnection#addTrack. Ignored.");
 		}
 		stream.getTracks().forEach(function (track) {
 			peerConnection.addTrack(track, stream);
@@ -1789,7 +1873,7 @@ var Negotiator = (function () {
 	};
 	
 	Negotiator.prototype._addStreamToMediaConnection = function (stream, mediaConnection) {
-		logger.default.log("add stream " + stream.id + " to media connection " + mediaConnection.connectionId);
+		Logger.log("add stream " + stream.id + " to media connection " + mediaConnection.connectionId);
 		mediaConnection.addStream(stream);
 	};
 	
@@ -1799,27 +1883,27 @@ var Negotiator = (function () {
 
 var BaseConnection = (function (_super) {
 
-    __extends(BaseConnection, _super);
-    
-    function BaseConnection(peer, provider, options) {
-        var _this = _super.call(this) || this;
-        _this.peer = peer;
-        _this.provider = provider;
-        _this.options = options;
-        _this._open = false;
-        _this.metadata = options.metadata;
-        return _this;
-    }
+	__extends(BaseConnection, _super);
+	
+	function BaseConnection(peer, provider, options) {
+		var _this = _super.call(this) || this;
+		_this.peer = peer;
+		_this.provider = provider;
+		_this.options = options;
+		_this._open = false;
+		_this.metadata = options.metadata;
+		return _this;
+	}
 
-    Object.defineProperty(BaseConnection.prototype, "open", {
-        get: function () {
-            return this._open;
-        },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(BaseConnection.prototype, "open", {
+		get: function () {
+			return this._open;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-    return BaseConnection;
+	return BaseConnection;
 
 }(EventEmitter));
 
@@ -1828,208 +1912,208 @@ var BaseConnection = (function (_super) {
  */
 var MediaConnection = (function (_super) {
 
-    __extends(MediaConnection, _super);
+	__extends(MediaConnection, _super);
 
-    function MediaConnection(peerId, provider, options) {
-        var _this = _super.call(this, peerId, provider, options) || this;
-        _this._localStream = _this.options._stream;
-        _this.connectionId =
-            _this.options.connectionId ||
-                MediaConnection.ID_PREFIX + util.randomToken();
-        _this._negotiator = new Negotiator(_this);
-        if (_this._localStream) {
-            _this._negotiator.startConnection({
-                _stream: _this._localStream,
-                originator: true
-            });
-        }
-        return _this;
-    }
+	function MediaConnection(peerId, provider, options) {
+		var _this = _super.call(this, peerId, provider, options) || this;
+		_this._localStream = _this.options._stream;
+		_this.connectionId =
+			_this.options.connectionId ||
+				MediaConnection.ID_PREFIX + util.randomToken();
+		_this._negotiator = new Negotiator(_this);
+		if (_this._localStream) {
+			_this._negotiator.startConnection({
+				_stream: _this._localStream,
+				originator: true
+			});
+		}
+		return _this;
+	}
 
-    Object.defineProperty(MediaConnection.prototype, "type", {
-        get: function () {
-            return ConnectionType.Media;
-        },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(MediaConnection.prototype, "type", {
+		get: function () {
+			return ConnectionType.Media;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-    Object.defineProperty(MediaConnection.prototype, "localStream", {
-        get: function () { return this._localStream; },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(MediaConnection.prototype, "localStream", {
+		get: function () { return this._localStream; },
+		enumerable: true,
+		configurable: true
+	});
 
-    Object.defineProperty(MediaConnection.prototype, "remoteStream", {
-        get: function () { return this._remoteStream; },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(MediaConnection.prototype, "remoteStream", {
+		get: function () { return this._remoteStream; },
+		enumerable: true,
+		configurable: true
+	});
 
-    MediaConnection.prototype.addStream = function (remoteStream) {
-        logger.default.log("Receiving stream", remoteStream);
-        this._remoteStream = remoteStream;
-        _super.prototype.emit.call(this, ConnectionEventType.Stream, remoteStream); // Should we call this `open`?
-    };
+	MediaConnection.prototype.addStream = function (remoteStream) {
+		Logger.log("Receiving stream", remoteStream);
+		this._remoteStream = remoteStream;
+		_super.prototype.emit.call(this, ConnectionEventType.Stream, remoteStream); // Should we call this `open`?
+	};
 
-    MediaConnection.prototype.handleMessage = function (message) {
-        var type = message.type;
-        var payload = message.payload;
-        switch (message.type) {
-            case ServerMessageType.Answer:
-                // Forward to negotiator
-                this._negotiator.handleSDP(type, payload.sdp);
-                this._open = true;
-                break;
-            case ServerMessageType.Candidate:
-                this._negotiator.handleCandidate(payload.candidate);
-                break;
-            default:
-                logger.default.warn("Unrecognized message type:" + type + " from peer:" + this.peer);
-                break;
-        }
-    };
+	MediaConnection.prototype.handleMessage = function (message) {
+		var type = message.type;
+		var payload = message.payload;
+		switch (message.type) {
+			case ServerMessageType.Answer:
+				// Forward to negotiator
+				this._negotiator.handleSDP(type, payload.sdp);
+				this._open = true;
+				break;
+			case ServerMessageType.Candidate:
+				this._negotiator.handleCandidate(payload.candidate);
+				break;
+			default:
+				Logger.warn("Unrecognized message type:" + type + " from peer:" + this.peer);
+				break;
+		}
+	};
 
-    MediaConnection.prototype.answer = function (stream, options) {
-        var e_1, _a;
-        if (options === void 0) { options = {}; }
-        if (this._localStream) {
-            logger.default.warn("Local stream already exists on this MediaConnection. Are you answering a call twice?");
-            return;
-        }
-        this._localStream = stream;
-        if (options && options.sdpTransform) {
-            this.options.sdpTransform = options.sdpTransform;
-        }
-        this._negotiator.startConnection(__assign(__assign({}, this.options._payload), { _stream: stream }));
-        // Retrieve lost messages stored because PeerConnection not set up.
-        var messages = this.provider._getMessages(this.connectionId);
-        try {
-            for (var messages_1 = __values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
-                var message = messages_1_1.value;
-                this.handleMessage(message);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (messages_1_1 && !messages_1_1.done && (_a = messages_1.return)) _a.call(messages_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        this._open = true;
-    };
+	MediaConnection.prototype.answer = function (stream, options) {
+		var e_1, _a;
+		if (options === void 0) { options = {}; }
+		if (this._localStream) {
+			Logger.warn("Local stream already exists on this MediaConnection. Are you answering a call twice?");
+			return;
+		}
+		this._localStream = stream;
+		if (options && options.sdpTransform) {
+			this.options.sdpTransform = options.sdpTransform;
+		}
+		this._negotiator.startConnection(__assign(__assign({}, this.options._payload), { _stream: stream }));
+		// Retrieve lost messages stored because PeerConnection not set up.
+		var messages = this.provider._getMessages(this.connectionId);
+		try {
+			for (var messages_1 = __values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
+				var message = messages_1_1.value;
+				this.handleMessage(message);
+			}
+		}
+		catch (e_1_1) { e_1 = { error: e_1_1 }; }
+		finally {
+			try {
+				if (messages_1_1 && !messages_1_1.done && (_a = messages_1.return)) _a.call(messages_1);
+			}
+			finally { if (e_1) throw e_1.error; }
+		}
+		this._open = true;
+	};
 
-    /**
-     * Exposed functionality for users.
-     */
-    /** Allows user to close connection. */
-    MediaConnection.prototype.close = function () {
-        if (this._negotiator) {
-            this._negotiator.cleanup();
-            this._negotiator = null;
-        }
-        this._localStream = null;
-        this._remoteStream = null;
-        if (this.provider) {
-            this.provider._removeConnection(this);
-            this.provider = null;
-        }
-        if (this.options && this.options._stream) {
-            this.options._stream = null;
-        }
-        if (!this.open) {
-            return;
-        }
-        this._open = false;
-        _super.prototype.emit.call(this, ConnectionEventType.Close);
-    };
-    
-    MediaConnection.ID_PREFIX = "mc_";
-    
-    return MediaConnection;
+	/**
+	 * Exposed functionality for users.
+	 */
+	/** Allows user to close connection. */
+	MediaConnection.prototype.close = function () {
+		if (this._negotiator) {
+			this._negotiator.cleanup();
+			this._negotiator = null;
+		}
+		this._localStream = null;
+		this._remoteStream = null;
+		if (this.provider) {
+			this.provider._removeConnection(this);
+			this.provider = null;
+		}
+		if (this.options && this.options._stream) {
+			this.options._stream = null;
+		}
+		if (!this.open) {
+			return;
+		}
+		this._open = false;
+		_super.prototype.emit.call(this, ConnectionEventType.Close);
+	};
+	
+	MediaConnection.ID_PREFIX = "mc_";
+	
+	return MediaConnection;
 
 }(BaseConnection));
 
 var EncodingQueue = (function (_super) {
 
-    var __extends = (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
+	var __extends = (function () {
+		var extendStatics = function (d, b) {
+			extendStatics = Object.setPrototypeOf ||
+				({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+				function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+			return extendStatics(d, b);
+		};
+		return function (d, b) {
+			extendStatics(d, b);
+			function __() { this.constructor = d; }
+			d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+		};
+	})();
 
-    __extends(EncodingQueue, _super);
+	__extends(EncodingQueue, _super);
 
-    function EncodingQueue() {
-        var _this = _super.call(this) || this;
-        _this.fileReader = new window.FileReader();
-        _this._queue = [];
-        _this._processing = false;
-        _this.fileReader.onload = function (evt) {
-            _this._processing = false;
-            if (evt.target) {
-                _this.emit('done', evt.target.result);
-            }
-            _this.doNextTask();
-        };
-        _this.fileReader.onerror = function (evt) {
-            logger.default.error("EncodingQueue error:", evt);
-            _this._processing = false;
-            _this.destroy();
-            _this.emit('error', evt);
-        };
-        return _this;
-    }
-    Object.defineProperty(EncodingQueue.prototype, "queue", {
-        get: function () {
-            return this._queue;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EncodingQueue.prototype, "size", {
-        get: function () {
-            return this.queue.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(EncodingQueue.prototype, "processing", {
-        get: function () {
-            return this._processing;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    EncodingQueue.prototype.enque = function (blob) {
-        this.queue.push(blob);
-        if (this.processing)
-            return;
-        this.doNextTask();
-    };
-    EncodingQueue.prototype.destroy = function () {
-        this.fileReader.abort();
-        this._queue = [];
-    };
-    EncodingQueue.prototype.doNextTask = function () {
-        if (this.size === 0)
-            return;
-        if (this.processing)
-            return;
-        this._processing = true;
-        this.fileReader.readAsArrayBuffer(this.queue.shift());
-    };
+	function EncodingQueue() {
+		var _this = _super.call(this) || this;
+		_this.fileReader = new window.FileReader();
+		_this._queue = [];
+		_this._processing = false;
+		_this.fileReader.onload = function (evt) {
+			_this._processing = false;
+			if (evt.target) {
+				_this.emit('done', evt.target.result);
+			}
+			_this.doNextTask();
+		};
+		_this.fileReader.onerror = function (evt) {
+			Logger.error("EncodingQueue error:", evt);
+			_this._processing = false;
+			_this.destroy();
+			_this.emit('error', evt);
+		};
+		return _this;
+	}
+	Object.defineProperty(EncodingQueue.prototype, "queue", {
+		get: function () {
+			return this._queue;
+		},
+		enumerable: true,
+		configurable: true
+	});
+	Object.defineProperty(EncodingQueue.prototype, "size", {
+		get: function () {
+			return this.queue.length;
+		},
+		enumerable: true,
+		configurable: true
+	});
+	Object.defineProperty(EncodingQueue.prototype, "processing", {
+		get: function () {
+			return this._processing;
+		},
+		enumerable: true,
+		configurable: true
+	});
+	EncodingQueue.prototype.enque = function (blob) {
+		this.queue.push(blob);
+		if (this.processing)
+			return;
+		this.doNextTask();
+	};
+	EncodingQueue.prototype.destroy = function () {
+		this.fileReader.abort();
+		this._queue = [];
+	};
+	EncodingQueue.prototype.doNextTask = function () {
+		if (this.size === 0)
+			return;
+		if (this.processing)
+			return;
+		this._processing = true;
+		this.fileReader.readAsArrayBuffer(this.queue.shift());
+	};
 
-    return EncodingQueue;
+	return EncodingQueue;
 
 }(EventEmitter));
 
@@ -2037,294 +2121,294 @@ var EncodingQueue = (function (_super) {
  * Wraps a DataChannel between two Peers.
  */
 var DataConnection = (function (_super) {
-    
-    __extends(DataConnection, _super);
+	
+	__extends(DataConnection, _super);
 
-    function DataConnection(peerId, provider, options) {
-        var _this = _super.call(this, peerId, provider, options) || this;
-        _this.stringify = JSON.stringify;
-        _this.parse = JSON.parse;
-        _this._buffer = [];
-        _this._bufferSize = 0;
-        _this._buffering = false;
-        _this._chunkedData = {};
-        _this._encodingQueue = new EncodingQueue();
-        _this.connectionId =
-            _this.options.connectionId || DataConnection.ID_PREFIX + util.randomToken();
-        _this.label = _this.options.label || _this.connectionId;
-        _this.serialization = _this.options.serialization || SerializationType.Binary;
-        _this.reliable = !!_this.options.reliable;
-        _this._encodingQueue.on('done', function (ab) {
-            _this._bufferedSend(ab);
-        });
-        _this._encodingQueue.on('error', function () {
-            logger.default.error("DC#" + _this.connectionId + ": Error occured in encoding from blob to arraybuffer, close DC");
-            _this.close();
-        });
-        _this._negotiator = new Negotiator(_this);
-        _this._negotiator.startConnection(_this.options._payload || {
-            originator: true
-        });
-        return _this;
-    }
+	function DataConnection(peerId, provider, options) {
+		var _this = _super.call(this, peerId, provider, options) || this;
+		_this.stringify = JSON.stringify;
+		_this.parse = JSON.parse;
+		_this._buffer = [];
+		_this._bufferSize = 0;
+		_this._buffering = false;
+		_this._chunkedData = {};
+		_this._encodingQueue = new EncodingQueue();
+		_this.connectionId =
+			_this.options.connectionId || DataConnection.ID_PREFIX + util.randomToken();
+		_this.label = _this.options.label || _this.connectionId;
+		_this.serialization = _this.options.serialization || SerializationType.Binary;
+		_this.reliable = !!_this.options.reliable;
+		_this._encodingQueue.on('done', function (ab) {
+			_this._bufferedSend(ab);
+		});
+		_this._encodingQueue.on('error', function () {
+			Logger.error("DC#" + _this.connectionId + ": Error occured in encoding from blob to arraybuffer, close DC");
+			_this.close();
+		});
+		_this._negotiator = new Negotiator(_this);
+		_this._negotiator.startConnection(_this.options._payload || {
+			originator: true
+		});
+		return _this;
+	}
 
-    Object.defineProperty(DataConnection.prototype, "type", {
-        get: function () {
-            return ConnectionType.Data;
-        },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(DataConnection.prototype, "type", {
+		get: function () {
+			return ConnectionType.Data;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-    Object.defineProperty(DataConnection.prototype, "dataChannel", {
-        get: function () {
-            return this._dc;
-        },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(DataConnection.prototype, "dataChannel", {
+		get: function () {
+			return this._dc;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-    Object.defineProperty(DataConnection.prototype, "bufferSize", {
-        get: function () { return this._bufferSize; },
-        enumerable: true,
-        configurable: true
-    });
+	Object.defineProperty(DataConnection.prototype, "bufferSize", {
+		get: function () { return this._bufferSize; },
+		enumerable: true,
+		configurable: true
+	});
 
-    /** Called by the Negotiator when the DataChannel is ready. */
-    DataConnection.prototype.initialize = function (dc) {
-        this._dc = dc;
-        this._configureDataChannel();
-    };
+	/** Called by the Negotiator when the DataChannel is ready. */
+	DataConnection.prototype.initialize = function (dc) {
+		this._dc = dc;
+		this._configureDataChannel();
+	};
 
-    DataConnection.prototype._configureDataChannel = function () {
-        var _this = this;
-        if (!util.supports.binaryBlob || util.supports.reliable) {
-            this.dataChannel.binaryType = "arraybuffer";
-        }
-        this.dataChannel.onopen = function () {
-            logger.default.log("DC#" + _this.connectionId + " dc connection success");
-            _this._open = true;
-            _this.emit(ConnectionEventType.Open);
-        };
-        this.dataChannel.onmessage = function (e) {
-            logger.default.log("DC#" + _this.connectionId + " dc onmessage:", e.data);
-            _this._handleDataMessage(e);
-        };
-        this.dataChannel.onclose = function () {
-            logger.default.log("DC#" + _this.connectionId + " dc closed for:", _this.peer);
-            _this.close();
-        };
-    };
+	DataConnection.prototype._configureDataChannel = function () {
+		var _this = this;
+		if (!util.supports.binaryBlob || util.supports.reliable) {
+			this.dataChannel.binaryType = "arraybuffer";
+		}
+		this.dataChannel.onopen = function () {
+			Logger.log("DC#" + _this.connectionId + " dc connection success");
+			_this._open = true;
+			_this.emit(ConnectionEventType.Open);
+		};
+		this.dataChannel.onmessage = function (e) {
+			Logger.log("DC#" + _this.connectionId + " dc onmessage:", e.data);
+			_this._handleDataMessage(e);
+		};
+		this.dataChannel.onclose = function () {
+			Logger.log("DC#" + _this.connectionId + " dc closed for:", _this.peer);
+			_this.close();
+		};
+	};
 
-    // Handles a DataChannel message.
-    DataConnection.prototype._handleDataMessage = function (_a) {
-        var _this = this;
-        var data = _a.data;
-        var datatype = data.constructor;
-        var isBinarySerialization = this.serialization === SerializationType.Binary ||
-            this.serialization === SerializationType.BinaryUTF8;
-        var deserializedData = data;
-        if (isBinarySerialization) {
-            if (datatype === window.Blob) {
-                // Datatype should never be blob
-                util.blobToArrayBuffer(data, function (ab) {
-                    var unpackedData = util.unpack(ab);
-                    _this.emit(ConnectionEventType.Data, unpackedData);
-                });
-                return;
-            }
-            else if (datatype === ArrayBuffer) {
-                deserializedData = util.unpack(data);
-            }
-            else if (datatype === String) {
-                // String fallback for binary data for browsers that don't support binary yet
-                var ab = util.binaryStringToArrayBuffer(data);
-                deserializedData = util.unpack(ab);
-            }
-        }
-        else if (this.serialization === SerializationType.JSON) {
-            deserializedData = this.parse(data);
-        }
-        // Check if we've chunked--if so, piece things back together.
-        // We're guaranteed that this isn't 0.
-        if (deserializedData.__peerData) {
-            this._handleChunk(deserializedData);
-            return;
-        }
-        _super.prototype.emit.call(this, ConnectionEventType.Data, deserializedData);
-    };
+	// Handles a DataChannel message.
+	DataConnection.prototype._handleDataMessage = function (_a) {
+		var _this = this;
+		var data = _a.data;
+		var datatype = data.constructor;
+		var isBinarySerialization = this.serialization === SerializationType.Binary ||
+			this.serialization === SerializationType.BinaryUTF8;
+		var deserializedData = data;
+		if (isBinarySerialization) {
+			if (datatype === window.Blob) {
+				// Datatype should never be blob
+				util.blobToArrayBuffer(data, function (ab) {
+					var unpackedData = util.unpack(ab);
+					_this.emit(ConnectionEventType.Data, unpackedData);
+				});
+				return;
+			}
+			else if (datatype === ArrayBuffer) {
+				deserializedData = util.unpack(data);
+			}
+			else if (datatype === String) {
+				// String fallback for binary data for browsers that don't support binary yet
+				var ab = util.binaryStringToArrayBuffer(data);
+				deserializedData = util.unpack(ab);
+			}
+		}
+		else if (this.serialization === SerializationType.JSON) {
+			deserializedData = this.parse(data);
+		}
+		// Check if we've chunked--if so, piece things back together.
+		// We're guaranteed that this isn't 0.
+		if (deserializedData.__peerData) {
+			this._handleChunk(deserializedData);
+			return;
+		}
+		_super.prototype.emit.call(this, ConnectionEventType.Data, deserializedData);
+	};
 
-    DataConnection.prototype._handleChunk = function (data) {
-        var id = data.__peerData;
-        var chunkInfo = this._chunkedData[id] || {
-            data: [],
-            count: 0,
-            total: data.total
-        };
-        chunkInfo.data[data.n] = data.data;
-        chunkInfo.count++;
-        this._chunkedData[id] = chunkInfo;
-        if (chunkInfo.total === chunkInfo.count) {
-            // Clean up before making the recursive call to `_handleDataMessage`.
-            delete this._chunkedData[id];
-            // We've received all the chunks--time to construct the complete data.
-            var data_1 = new window.Blob(chunkInfo.data);
-            this._handleDataMessage({ data: data_1 });
-        }
-    };
+	DataConnection.prototype._handleChunk = function (data) {
+		var id = data.__peerData;
+		var chunkInfo = this._chunkedData[id] || {
+			data: [],
+			count: 0,
+			total: data.total
+		};
+		chunkInfo.data[data.n] = data.data;
+		chunkInfo.count++;
+		this._chunkedData[id] = chunkInfo;
+		if (chunkInfo.total === chunkInfo.count) {
+			// Clean up before making the recursive call to `_handleDataMessage`.
+			delete this._chunkedData[id];
+			// We've received all the chunks--time to construct the complete data.
+			var data_1 = new window.Blob(chunkInfo.data);
+			this._handleDataMessage({ data: data_1 });
+		}
+	};
 
-    /**
-     * Exposed functionality for users.
-     */
-    /** Allows user to close connection. */
-    DataConnection.prototype.close = function () {
-        this._buffer = [];
-        this._bufferSize = 0;
-        this._chunkedData = {};
-        if (this._negotiator) {
-            this._negotiator.cleanup();
-            this._negotiator = null;
-        }
-        if (this.provider) {
-            this.provider._removeConnection(this);
-            this.provider = null;
-        }
-        if (this.dataChannel) {
-            this.dataChannel.onopen = null;
-            this.dataChannel.onmessage = null;
-            this.dataChannel.onclose = null;
-            this._dc = null;
-        }
-        if (this._encodingQueue) {
-            this._encodingQueue.destroy();
-            this._encodingQueue.removeAllListeners();
-            this._encodingQueue = null;
-        }
-        if (!this.open) {
-            return;
-        }
-        this._open = false;
-        _super.prototype.emit.call(this, ConnectionEventType.Close);
-    };
+	/**
+	 * Exposed functionality for users.
+	 */
+	/** Allows user to close connection. */
+	DataConnection.prototype.close = function () {
+		this._buffer = [];
+		this._bufferSize = 0;
+		this._chunkedData = {};
+		if (this._negotiator) {
+			this._negotiator.cleanup();
+			this._negotiator = null;
+		}
+		if (this.provider) {
+			this.provider._removeConnection(this);
+			this.provider = null;
+		}
+		if (this.dataChannel) {
+			this.dataChannel.onopen = null;
+			this.dataChannel.onmessage = null;
+			this.dataChannel.onclose = null;
+			this._dc = null;
+		}
+		if (this._encodingQueue) {
+			this._encodingQueue.destroy();
+			this._encodingQueue.removeAllListeners();
+			this._encodingQueue = null;
+		}
+		if (!this.open) {
+			return;
+		}
+		this._open = false;
+		_super.prototype.emit.call(this, ConnectionEventType.Close);
+	};
 
-    /** Allows user to send data. */
-    DataConnection.prototype.send = function (data, chunked) {
-        if (!this.open) {
-            _super.prototype.emit.call(this, ConnectionEventType.Error, new Error("Connection is not open. You should listen for the `open` event before sending messages."));
-            return;
-        }
-        if (this.serialization === SerializationType.JSON) {
-            this._bufferedSend(this.stringify(data));
-        }
-        else if (this.serialization === SerializationType.Binary ||
-            this.serialization === SerializationType.BinaryUTF8) {
-            var blob = util.pack(data);
-            if (!chunked && blob.size > util.chunkedMTU) {
-                this._sendChunks(blob);
-                return;
-            }
-            if (!util.supports.binaryBlob) {
-                // We only do this if we really need to (e.g. blobs are not supported),
-                // because this conversion is costly.
-                this._encodingQueue.enque(blob);
-            }
-            else {
-                this._bufferedSend(blob);
-            }
-        }
-        else {
-            this._bufferedSend(data);
-        }
-    };
+	/** Allows user to send data. */
+	DataConnection.prototype.send = function (data, chunked) {
+		if (!this.open) {
+			_super.prototype.emit.call(this, ConnectionEventType.Error, new Error("Connection is not open. You should listen for the `open` event before sending messages."));
+			return;
+		}
+		if (this.serialization === SerializationType.JSON) {
+			this._bufferedSend(this.stringify(data));
+		}
+		else if (this.serialization === SerializationType.Binary ||
+			this.serialization === SerializationType.BinaryUTF8) {
+			var blob = util.pack(data);
+			if (!chunked && blob.size > util.chunkedMTU) {
+				this._sendChunks(blob);
+				return;
+			}
+			if (!util.supports.binaryBlob) {
+				// We only do this if we really need to (e.g. blobs are not supported),
+				// because this conversion is costly.
+				this._encodingQueue.enque(blob);
+			}
+			else {
+				this._bufferedSend(blob);
+			}
+		}
+		else {
+			this._bufferedSend(data);
+		}
+	};
 
-    DataConnection.prototype._bufferedSend = function (msg) {
-        if (this._buffering || !this._trySend(msg)) {
-            this._buffer.push(msg);
-            this._bufferSize = this._buffer.length;
-        }
-    };
+	DataConnection.prototype._bufferedSend = function (msg) {
+		if (this._buffering || !this._trySend(msg)) {
+			this._buffer.push(msg);
+			this._bufferSize = this._buffer.length;
+		}
+	};
 
-    // Returns true if the send succeeds.
-    DataConnection.prototype._trySend = function (msg) {
-        var _this = this;
-        if (!this.open) {
-            return false;
-        }
-        if (this.dataChannel.bufferedAmount > DataConnection.MAX_BUFFERED_AMOUNT) {
-            this._buffering = true;
-            setTimeout(function () {
-                _this._buffering = false;
-                _this._tryBuffer();
-            }, 50);
-            return false;
-        }
-        try {
-            this.dataChannel.send(msg);
-        }
-        catch (e) {
-            logger.default.error("DC#:" + this.connectionId + " Error when sending:", e);
-            this._buffering = true;
-            this.close();
-            return false;
-        }
-        return true;
-    };
+	// Returns true if the send succeeds.
+	DataConnection.prototype._trySend = function (msg) {
+		var _this = this;
+		if (!this.open) {
+			return false;
+		}
+		if (this.dataChannel.bufferedAmount > DataConnection.MAX_BUFFERED_AMOUNT) {
+			this._buffering = true;
+			setTimeout(function () {
+				_this._buffering = false;
+				_this._tryBuffer();
+			}, 50);
+			return false;
+		}
+		try {
+			this.dataChannel.send(msg);
+		}
+		catch (e) {
+			Logger.error("DC#:" + this.connectionId + " Error when sending:", e);
+			this._buffering = true;
+			this.close();
+			return false;
+		}
+		return true;
+	};
 
-    // Try to send the first message in the buffer.
-    DataConnection.prototype._tryBuffer = function () {
-        if (!this.open) {
-            return;
-        }
-        if (this._buffer.length === 0) {
-            return;
-        }
-        var msg = this._buffer[0];
-        if (this._trySend(msg)) {
-            this._buffer.shift();
-            this._bufferSize = this._buffer.length;
-            this._tryBuffer();
-        }
-    };
+	// Try to send the first message in the buffer.
+	DataConnection.prototype._tryBuffer = function () {
+		if (!this.open) {
+			return;
+		}
+		if (this._buffer.length === 0) {
+			return;
+		}
+		var msg = this._buffer[0];
+		if (this._trySend(msg)) {
+			this._buffer.shift();
+			this._bufferSize = this._buffer.length;
+			this._tryBuffer();
+		}
+	};
 
-    DataConnection.prototype._sendChunks = function (blob) {
-        var e_1, _a;
-        var blobs = util.chunk(blob);
-        logger.default.log("DC#" + this.connectionId + " Try to send " + blobs.length + " chunks...");
-        try {
-            for (var blobs_1 = __values(blobs), blobs_1_1 = blobs_1.next(); !blobs_1_1.done; blobs_1_1 = blobs_1.next()) {
-                var blob_1 = blobs_1_1.value;
-                this.send(blob_1, true);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (blobs_1_1 && !blobs_1_1.done && (_a = blobs_1.return)) _a.call(blobs_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-    };
+	DataConnection.prototype._sendChunks = function (blob) {
+		var e_1, _a;
+		var blobs = util.chunk(blob);
+		Logger.log("DC#" + this.connectionId + " Try to send " + blobs.length + " chunks...");
+		try {
+			for (var blobs_1 = __values(blobs), blobs_1_1 = blobs_1.next(); !blobs_1_1.done; blobs_1_1 = blobs_1.next()) {
+				var blob_1 = blobs_1_1.value;
+				this.send(blob_1, true);
+			}
+		}
+		catch (e_1_1) { e_1 = { error: e_1_1 }; }
+		finally {
+			try {
+				if (blobs_1_1 && !blobs_1_1.done && (_a = blobs_1.return)) _a.call(blobs_1);
+			}
+			finally { if (e_1) throw e_1.error; }
+		}
+	};
 
-    DataConnection.prototype.handleMessage = function (message) {
-        var payload = message.payload;
-        switch (message.type) {
-            case ServerMessageType.Answer:
-                this._negotiator.handleSDP(message.type, payload.sdp);
-                break;
-            case ServerMessageType.Candidate:
-                this._negotiator.handleCandidate(payload.candidate);
-                break;
-            default:
-                logger.default.warn("Unrecognized message type:", message.type, "from peer:", this.peer);
-                break;
-        }
-    };
+	DataConnection.prototype.handleMessage = function (message) {
+		var payload = message.payload;
+		switch (message.type) {
+			case ServerMessageType.Answer:
+				this._negotiator.handleSDP(message.type, payload.sdp);
+				break;
+			case ServerMessageType.Candidate:
+				this._negotiator.handleCandidate(payload.candidate);
+				break;
+			default:
+				Logger.warn("Unrecognized message type:", message.type, "from peer:", this.peer);
+				break;
+		}
+	};
 
-    DataConnection.ID_PREFIX = "dc_";
+	DataConnection.ID_PREFIX = "dc_";
 
-    DataConnection.MAX_BUFFERED_AMOUNT = 8 * 1024 * 1024;
+	DataConnection.MAX_BUFFERED_AMOUNT = 8 * 1024 * 1024;
 
-    return DataConnection;
+	return DataConnection;
 
 }(BaseConnection));
 
@@ -2393,11 +2477,11 @@ const Peer = (function (_super) {
 
 		// Set a custom log function if present
 		if (_this._options.logFunction) {
-			logger.default.setLogFunction(_this._options.logFunction);
+			Logger.setLogFunction(_this._options.logFunction);
 		}
 
-		logger.default.logLevel = _this._options.debug || 0;
-		_this._api = new api_1.API(options);
+		Logger.logLevel = _this._options.debug || 0;
+		_this._api = new API(options);
 		_this._socket = _this._createServerConnection();
 		// Sanity checks
 		// Ensure WebRTC supported
@@ -2562,7 +2646,7 @@ const Peer = (function (_super) {
 				this._abort(PeerErrorType.InvalidKey, "API KEY \"" + this._options.key + "\" is invalid");
 				break;
 			case ServerMessageType.Leave: // Another peer has closed its connection to this peer.
-				logger.default.log("Received leave message from " + peerId);
+				Logger.log("Received leave message from " + peerId);
 				this._cleanupPeer(peerId);
 				this._connections.delete(peerId);
 				break;
@@ -2575,7 +2659,7 @@ const Peer = (function (_super) {
 				var connection = this.getConnection(peerId, connectionId);
 				if (connection) {
 					connection.close();
-					logger.default.warn("Offer received for existing Connection ID:" + connectionId);
+					Logger.warn("Offer received for existing Connection ID:" + connectionId);
 				}
 				// Create a new connection.
 				if (payload.type === ConnectionType.Media) {
@@ -2600,7 +2684,7 @@ const Peer = (function (_super) {
 					this.emit(PeerEventType.Connection, connection);
 				}
 				else {
-					logger.default.warn("Received malformed connection type:" + payload.type);
+					Logger.warn("Received malformed connection type:" + payload.type);
 					return;
 				}
 				// Find messages.
@@ -2622,7 +2706,7 @@ const Peer = (function (_super) {
 			}
 			default: {
 				if (!payload) {
-					logger.default.warn("You received a malformed message from " + peerId + " of type " + type);
+					Logger.warn("You received a malformed message from " + peerId + " of type " + type);
 					return;
 				}
 				var connectionId = payload.connectionId;
@@ -2636,7 +2720,7 @@ const Peer = (function (_super) {
 					this._storeMessage(connectionId, message);
 				}
 				else {
-					logger.default.warn("You received an unrecognized message:", message);
+					Logger.warn("You received an unrecognized message:", message);
 				}
 				break;
 			}
@@ -2669,7 +2753,7 @@ const Peer = (function (_super) {
 	Peer.prototype.connect = function (peer, options) {
 		if (options === void 0) { options = {}; }
 		if (this.disconnected) {
-			logger.default.warn("You cannot connect to a new Peer because you called " +
+			Logger.warn("You cannot connect to a new Peer because you called " +
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect, or call reconnect " +
 				"on this peer if you believe its ID to still be available.");
@@ -2688,14 +2772,14 @@ const Peer = (function (_super) {
 	Peer.prototype.call = function (peer, stream, options) {
 		if (options === void 0) { options = {}; }
 		if (this.disconnected) {
-			logger.default.warn("You cannot connect to a new Peer because you called " +
+			Logger.warn("You cannot connect to a new Peer because you called " +
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect.");
 			this.emitError(PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
 			return;
 		}
 		if (!stream) {
-			logger.default.error("To call a peer, you must provide a stream from your browser's `getUserMedia`.");
+			Logger.error("To call a peer, you must provide a stream from your browser's `getUserMedia`.");
 			return;
 		}
 		options._stream = stream;
@@ -2706,7 +2790,7 @@ const Peer = (function (_super) {
 
 	/** Add a data/media connection to this peer. */
 	Peer.prototype._addConnection = function (peerId, connection) {
-		logger.default.log("add connection " + connection.type + ":" + connection.connectionId + " to peerId:" + peerId);
+		Logger.log("add connection " + connection.type + ":" + connection.connectionId + " to peerId:" + peerId);
 		if (!this._connections.has(peerId)) {
 			this._connections.set(peerId, []);
 		}
@@ -2764,7 +2848,7 @@ const Peer = (function (_super) {
 	 * it retains its disconnected state and its existing connections.
 	 */
 	Peer.prototype._abort = function (type, message) {
-		logger.default.error("Aborting!");
+		Logger.error("Aborting!");
 		this.emitError(type, message);
 		if (!this._lastServerId) {
 			this.destroy();
@@ -2776,7 +2860,7 @@ const Peer = (function (_super) {
 
 	/** Emits a typed error message. */
 	Peer.prototype.emitError = function (type, err) {
-		logger.default.error("Error:", err);
+		Logger.error("Error:", err);
 		var error;
 		if (typeof err === "string") {
 			error = new Error(err);
@@ -2798,7 +2882,7 @@ const Peer = (function (_super) {
 		if (this.destroyed) {
 			return;
 		}
-		logger.default.log("Destroy peer with ID:" + this.id);
+		Logger.log("Destroy peer with ID:" + this.id);
 		this.disconnect();
 		this._cleanup();
 		this._destroyed = true;
@@ -2857,7 +2941,7 @@ const Peer = (function (_super) {
 			return;
 		}
 		var currentId = this.id;
-		logger.default.log("Disconnect peer with ID:" + currentId);
+		Logger.log("Disconnect peer with ID:" + currentId);
 		this._disconnected = true;
 		this._open = false;
 		this.socket.close();
@@ -2869,7 +2953,7 @@ const Peer = (function (_super) {
 	/** Attempts to reconnect with the same ID. */
 	Peer.prototype.reconnect = function () {
 		if (this.disconnected && !this.destroyed) {
-			logger.default.log("Attempting reconnection to server with ID " + this._lastServerId);
+			Logger.log("Attempting reconnection to server with ID " + this._lastServerId);
 			this._disconnected = false;
 			this._initialize(this._lastServerId);
 		}
@@ -2878,7 +2962,7 @@ const Peer = (function (_super) {
 		}
 		else if (!this.disconnected && !this.open) {
 			// Do nothing. We're still connecting the first time.
-			logger.default.error("In a hurry? We're still trying to make the initial connection!");
+			Logger.error("In a hurry? We're still trying to make the initial connection!");
 		}
 		else {
 			throw new Error("Peer " + this.id + " cannot reconnect because it is not disconnected from the server!");

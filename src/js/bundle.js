@@ -1,5 +1,5 @@
 
-import { Peer } from "./modules/peerjs/peer.js";
+import { Peer } from "./modules/peerjs/Peer.js";
 
 module.exports = {
 	Peer,
