@@ -104,7 +104,7 @@ var DataConnection = (function (_super) {
 			this.serialization === SerializationType.BinaryUTF8;
 		var deserializedData = data;
 		if (isBinarySerialization) {
-			if (datatype === window.Blob) {
+			if (datatype === Blob) {
 				// Datatype should never be blob
 				Utils.util.blobToArrayBuffer(data, function (ab) {
 					var unpackedData = Utils.util.unpack(ab);
@@ -147,7 +147,7 @@ var DataConnection = (function (_super) {
 			// Clean up before making the recursive call to `_handleDataMessage`.
 			delete this._chunkedData[id];
 			// We've received all the chunks--time to construct the complete data.
-			var data_1 = new window.Blob(chunkInfo.data);
+			var data_1 = new Blob(chunkInfo.data);
 			this._handleDataMessage({ data: data_1 });
 		}
 	};

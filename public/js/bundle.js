@@ -544,7 +544,7 @@ const Supports = new (function () {
 		var tempPc;
 		var supported = false;
 		try {
-			tempPc = new window.RTCPeerConnection();
+			tempPc = new RTCPeerConnection();
 			tempPc.addTransceiver('audio');
 			supported = true;
 		}
@@ -598,7 +598,7 @@ const util = new (function () {
 				return supported;
 			var pc;
 			try {
-				pc = new window.RTCPeerConnection(DEFAULT_CONFIG);
+				pc = new RTCPeerConnection(DEFAULT_CONFIG);
 				supported.audioVideo = true;
 				var dc = void 0;
 				try {
@@ -669,7 +669,7 @@ const util = new (function () {
 	};
 
 	class_1.prototype.blobToArrayBuffer = function (blob, cb) {
-		var fr = new window.FileReader();
+		var fr = new FileReader();
 		fr.onload = function (evt) {
 			if (evt.target) {
 				cb(evt.target.result);
@@ -917,6 +917,7 @@ var API = (function () {
 
 	/** Get a unique ID from the server via XHR and initialize with it. */
 	API.prototype.retrieveId = function () {
+		console.log(window);
 		return __awaiter(this, void 0, void 0, function () {
 			var url, response, error_1, pathError;
 			return __generator(this, function (_a) {
@@ -926,7 +927,7 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, window.fetch(url)];
+						return [4 /*yield*/, fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {
@@ -962,7 +963,7 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, window.fetch(url)];
+						return [4 /*yield*/, fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {
@@ -2055,7 +2056,7 @@ var EncodingQueue = (function (_super) {
 
 	function EncodingQueue() {
 		var _this = _super.call(this) || this;
-		_this.fileReader = new window.FileReader();
+		_this.fileReader = new FileReader();
 		_this._queue = [];
 		_this._processing = false;
 		_this.fileReader.onload = function (evt) {
@@ -2209,7 +2210,7 @@ var DataConnection = (function (_super) {
 			this.serialization === SerializationType.BinaryUTF8;
 		var deserializedData = data;
 		if (isBinarySerialization) {
-			if (datatype === window.Blob) {
+			if (datatype === Blob) {
 				// Datatype should never be blob
 				util.blobToArrayBuffer(data, function (ab) {
 					var unpackedData = util.unpack(ab);
@@ -2252,7 +2253,7 @@ var DataConnection = (function (_super) {
 			// Clean up before making the recursive call to `_handleDataMessage`.
 			delete this._chunkedData[id];
 			// We've received all the chunks--time to construct the complete data.
-			var data_1 = new window.Blob(chunkInfo.data);
+			var data_1 = new Blob(chunkInfo.data);
 			this._handleDataMessage({ data: data_1 });
 		}
 	};

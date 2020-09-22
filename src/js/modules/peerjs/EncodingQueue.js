@@ -23,7 +23,7 @@ var EncodingQueue = (function (_super) {
 
 	function EncodingQueue() {
 		var _this = _super.call(this) || this;
-		_this.fileReader = new window.FileReader();
+		_this.fileReader = new FileReader();
 		_this._queue = [];
 		_this._processing = false;
 		_this.fileReader.onload = function (evt) {

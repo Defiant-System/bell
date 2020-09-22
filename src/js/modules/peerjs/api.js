@@ -26,6 +26,7 @@ var API = (function () {
 
 	/** Get a unique ID from the server via XHR and initialize with it. */
 	API.prototype.retrieveId = function () {
+		console.log(window);
 		return Utils.__awaiter(this, void 0, void 0, function () {
 			var url, response, error_1, pathError;
 			return Utils.__generator(this, function (_a) {
@@ -35,7 +36,7 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, window.fetch(url)];
+						return [4 /*yield*/, fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {
@@ -71,7 +72,7 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, window.fetch(url)];
+						return [4 /*yield*/, fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {

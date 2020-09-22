@@ -82,6 +82,8 @@ const facetime = {
 				let myPeer = new Peer(undefined, { host: "/", port: "3001" });
 				console.log(myPeer);
 
+				//window.fetch("http://localhost:3001/peerjs/id?ts=16007782197690.3675754339665196");
+
 				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;

@@ -36,7 +36,7 @@ const util = new (function () {
 				return supported;
 			var pc;
 			try {
-				pc = new window.RTCPeerConnection(DEFAULT_CONFIG);
+				pc = new RTCPeerConnection(DEFAULT_CONFIG);
 				supported.audioVideo = true;
 				var dc = void 0;
 				try {
@@ -107,7 +107,7 @@ const util = new (function () {
 	};
 
 	class_1.prototype.blobToArrayBuffer = function (blob, cb) {
-		var fr = new window.FileReader();
+		var fr = new FileReader();
 		fr.onload = function (evt) {
 			if (evt.target) {
 				cb(evt.target.result);

@@ -45,7 +45,7 @@ const Supports = new (function () {
 		var tempPc;
 		var supported = false;
 		try {
-			tempPc = new window.RTCPeerConnection();
+			tempPc = new RTCPeerConnection();
 			tempPc.addTransceiver('audio');
 			supported = true;
 		}
