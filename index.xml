@@ -1,4 +1,7 @@
 <Application>
+	<Build>
+		<task actio1n="skip" source="src/js/bundle.js" destination="public/js/bundle.js"/>
+	</Build>
 	<Head>
 		<meta name="id" value="facetime"/>
 		<meta name="title" value="Facetime" version="1.0"/>

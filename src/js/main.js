@@ -1,7 +1,17 @@
 
+let Peer;
+window.fetch("~/js/bundle.js").then(lib => {
+	console.log(lib);
+	Peer = lib.Peer;
+	// init applications
+	//facetime.dispatch({ type: "init-peer-js" });
+});
+
 defiant.require("modules/call.js");
 
+
 const ME = defiant.user.username;
+const UUID = $.uuidv4();
 
 const facetime = {
 	els: {},
@@ -22,12 +32,12 @@ const facetime = {
 			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
 		});
 
-		// temp
+		// auto click "all" tab
 		window.find(".tab-row > div[data-arg='all']").trigger("click");
 
-		if (ME === "bill") {
-			window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-voice-call']").trigger("click");
-		}
+		// if (ME === "bill") {
+		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
+		// }
 	},
 	dispatch(event) {
 		let Self = facetime,
@@ -39,10 +49,12 @@ const facetime = {
 			// system events
 			case "window.open":
 				return;
-				navigator.mediaDevices.getUserMedia({
+				navigator.mediaDevices
+					.getUserMedia({
 						video: true,
 						audio: true
-					}).then(stream => {
+					})
+					.then(stream => {
 						let video = Self.els.videoMe[0];
 						
 						Self.stream = stream;
@@ -65,6 +77,9 @@ const facetime = {
 				}
 				break;
 			// custom events
+			case "init-peer-js":
+				console.log(Peer);
+				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;
 				isOn = isOn || Self.els.sidebarToggler.hasClass("push-in");
