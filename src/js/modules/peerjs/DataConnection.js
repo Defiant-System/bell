@@ -1,23 +1,10 @@
 
-import * as Utils from "./utils.js";
-import { Logger } from "./Logger.js";
-import { Negotiator } from "./Negotiator.js";
-import { BaseConnection } from "./BaseConnection.js";
-import { EncodingQueue } from "./EncodingQueue.js";
-import {
-	SerializationType,
-	ConnectionType,
-	ConnectionEventType,
-	ServerMessageType
-} from "./enums.js";
-
-
 /**
  * Wraps a DataChannel between two Peers.
  */
 var DataConnection = (function (_super) {
 	
-	Utils.__extends(DataConnection, _super);
+	__extends(DataConnection, _super);
 
 	function DataConnection(peerId, provider, options) {
 		var _this = _super.call(this, peerId, provider, options) || this;
@@ -29,9 +16,9 @@ var DataConnection = (function (_super) {
 		_this._chunkedData = {};
 		_this._encodingQueue = new EncodingQueue();
 		_this.connectionId =
-			_this.options.connectionId || DataConnection.ID_PREFIX + Utils.util.randomToken();
+			_this.options.connectionId || DataConnection.ID_PREFIX + util.randomToken();
 		_this.label = _this.options.label || _this.connectionId;
-		_this.serialization = _this.options.serialization || SerializationType.Binary;
+		_this.serialization = _this.options.serialization || Enums.SerializationType.Binary;
 		_this.reliable = !!_this.options.reliable;
 		_this._encodingQueue.on('done', function (ab) {
 			_this._bufferedSend(ab);
@@ -49,7 +36,7 @@ var DataConnection = (function (_super) {
 
 	Object.defineProperty(DataConnection.prototype, "type", {
 		get: function () {
-			return ConnectionType.Data;
+			return Enums.ConnectionType.Data;
 		},
 		enumerable: true,
 		configurable: true
@@ -77,13 +64,13 @@ var DataConnection = (function (_super) {
 
 	DataConnection.prototype._configureDataChannel = function () {
 		var _this = this;
-		if (!Utils.util.supports.binaryBlob || Utils.util.supports.reliable) {
+		if (!util.supports.binaryBlob || util.supports.reliable) {
 			this.dataChannel.binaryType = "arraybuffer";
 		}
 		this.dataChannel.onopen = function () {
 			Logger.log("DC#" + _this.connectionId + " dc connection success");
 			_this._open = true;
-			_this.emit(ConnectionEventType.Open);
+			_this.emit(Enums.ConnectionEventType.Open);
 		};
 		this.dataChannel.onmessage = function (e) {
 			Logger.log("DC#" + _this.connectionId + " dc onmessage:", e.data);
@@ -100,28 +87,28 @@ var DataConnection = (function (_super) {
 		var _this = this;
 		var data = _a.data;
 		var datatype = data.constructor;
-		var isBinarySerialization = this.serialization === SerializationType.Binary ||
-			this.serialization === SerializationType.BinaryUTF8;
+		var isBinarySerialization = this.serialization === Enums.SerializationType.Binary ||
+			this.serialization === Enums.SerializationType.BinaryUTF8;
 		var deserializedData = data;
 		if (isBinarySerialization) {
 			if (datatype === Blob) {
 				// Datatype should never be blob
-				Utils.util.blobToArrayBuffer(data, function (ab) {
-					var unpackedData = Utils.util.unpack(ab);
-					_this.emit(ConnectionEventType.Data, unpackedData);
+				util.blobToArrayBuffer(data, function (ab) {
+					var unpackedData = util.unpack(ab);
+					_this.emit(Enums.ConnectionEventType.Data, unpackedData);
 				});
 				return;
 			}
 			else if (datatype === ArrayBuffer) {
-				deserializedData = Utils.util.unpack(data);
+				deserializedData = util.unpack(data);
 			}
 			else if (datatype === String) {
 				// String fallback for binary data for browsers that don't support binary yet
-				var ab = Utils.util.binaryStringToArrayBuffer(data);
-				deserializedData = Utils.util.unpack(ab);
+				var ab = util.binaryStringToArrayBuffer(data);
+				deserializedData = util.unpack(ab);
 			}
 		}
-		else if (this.serialization === SerializationType.JSON) {
+		else if (this.serialization === Enums.SerializationType.JSON) {
 			deserializedData = this.parse(data);
 		}
 		// Check if we've chunked--if so, piece things back together.
@@ -130,7 +117,7 @@ var DataConnection = (function (_super) {
 			this._handleChunk(deserializedData);
 			return;
 		}
-		_super.prototype.emit.call(this, ConnectionEventType.Data, deserializedData);
+		_super.prototype.emit.call(this, Enums.ConnectionEventType.Data, deserializedData);
 	};
 
 	DataConnection.prototype._handleChunk = function (data) {
@@ -183,26 +170,26 @@ var DataConnection = (function (_super) {
 			return;
 		}
 		this._open = false;
-		_super.prototype.emit.call(this, ConnectionEventType.Close);
+		_super.prototype.emit.call(this, Enums.ConnectionEventType.Close);
 	};
 
 	/** Allows user to send data. */
 	DataConnection.prototype.send = function (data, chunked) {
 		if (!this.open) {
-			_super.prototype.emit.call(this, ConnectionEventType.Error, new Error("Connection is not open. You should listen for the `open` event before sending messages."));
+			_super.prototype.emit.call(this, Enums.ConnectionEventType.Error, new Error("Connection is not open. You should listen for the `open` event before sending messages."));
 			return;
 		}
-		if (this.serialization === SerializationType.JSON) {
+		if (this.serialization === Enums.SerializationType.JSON) {
 			this._bufferedSend(this.stringify(data));
 		}
-		else if (this.serialization === SerializationType.Binary ||
-			this.serialization === SerializationType.BinaryUTF8) {
-			var blob = Utils.util.pack(data);
-			if (!chunked && blob.size > Utils.util.chunkedMTU) {
+		else if (this.serialization === Enums.SerializationType.Binary ||
+			this.serialization === Enums.SerializationType.BinaryUTF8) {
+			var blob = util.pack(data);
+			if (!chunked && blob.size > util.chunkedMTU) {
 				this._sendChunks(blob);
 				return;
 			}
-			if (!Utils.util.supports.binaryBlob) {
+			if (!util.supports.binaryBlob) {
 				// We only do this if we really need to (e.g. blobs are not supported),
 				// because this conversion is costly.
 				this._encodingQueue.enque(blob);
@@ -267,16 +254,16 @@ var DataConnection = (function (_super) {
 
 	DataConnection.prototype._sendChunks = function (blob) {
 		var e_1, _a;
-		var blobs = Utils.util.chunk(blob);
+		var blobs = util.chunk(blob);
 		Logger.log("DC#" + this.connectionId + " Try to send " + blobs.length + " chunks...");
 		try {
-			for (var blobs_1 = Utils.__values(blobs), blobs_1_1 = blobs_1.next(); !blobs_1_1.done; blobs_1_1 = blobs_1.next()) {
+			for (var blobs_1 = __values(blobs), blobs_1_1 = blobs_1.next(); !blobs_1_1.done; blobs_1_1 = blobs_1.next()) {
 				var blob_1 = blobs_1_1.value;
 				this.send(blob_1, true);
 			}
-		}
-		catch (e_1_1) { e_1 = { error: e_1_1 }; }
-		finally {
+		} catch (e_1_1) {
+			e_1 = { error: e_1_1 };
+		} finally {
 			try {
 				if (blobs_1_1 && !blobs_1_1.done && (_a = blobs_1.return)) _a.call(blobs_1);
 			}
@@ -287,10 +274,10 @@ var DataConnection = (function (_super) {
 	DataConnection.prototype.handleMessage = function (message) {
 		var payload = message.payload;
 		switch (message.type) {
-			case ServerMessageType.Answer:
+			case Enums.ServerMessageType.Answer:
 				this._negotiator.handleSDP(message.type, payload.sdp);
 				break;
-			case ServerMessageType.Candidate:
+			case Enums.ServerMessageType.Candidate:
 				this._negotiator.handleCandidate(payload.candidate);
 				break;
 			default:
@@ -306,5 +293,3 @@ var DataConnection = (function (_super) {
 	return DataConnection;
 
 }(BaseConnection));
-
-export { DataConnection };

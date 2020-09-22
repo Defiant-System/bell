@@ -1,8 +1,4 @@
 
-import { EventEmitter } from "./EventEmitter.js";
-import { Logger } from "./Logger.js";
-
-
 var EncodingQueue = (function (_super) {
 
 	var __extends = (function () {
@@ -84,5 +80,3 @@ var EncodingQueue = (function (_super) {
 	return EncodingQueue;
 
 }(EventEmitter));
-
-export { EncodingQueue };

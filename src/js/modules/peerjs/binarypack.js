@@ -498,5 +498,3 @@ Packer.prototype.pack_int64 = function (num) {
 	this.bufferBuilder.append((low & 0x0000ff00) >>> 8);
 	this.bufferBuilder.append((low & 0x000000ff));
 };
-
-export { BinaryPack };

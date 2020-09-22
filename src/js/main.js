@@ -1,11 +1,5 @@
 
-let Peer;
-window.fetch("~/js/bundle.js").then(lib => {
-	Peer = lib.Peer;
-	// init applications
-	facetime.dispatch({ type: "init-peer-js" });
-});
-
+defiant.require("./bundle.js");
 defiant.require("modules/call.js");
 
 
@@ -79,8 +73,8 @@ const facetime = {
 			case "init-peer-js":
 				//console.log(Peer);
 
-				let myPeer = new Peer(undefined, { host: "/", port: "3001" });
-				console.log(myPeer);
+				// let myPeer = new Peer(undefined, { host: "/", port: "3001" });
+				// console.log(myPeer);
 
 				//window.fetch("http://localhost:3001/peerjs/id?ts=16007782197690.3675754339665196");
 

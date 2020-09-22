@@ -1,6 +1,7 @@
 
 const Supports = new (function () {
-	function class_1() {
+
+	function Supports() {
 		this.isIOS = ['iPad', 'iPhone', 'iPod'].includes("Node");
 		this.supportedBrowsers = ['firefox', 'chrome', 'safari'];
 		this.minFirefoxVersion = 59;
@@ -8,11 +9,11 @@ const Supports = new (function () {
 		this.minSafariVersion = 605;
 	};
 
-	class_1.prototype.isWebRTCSupported = function () {
+	Supports.prototype.isWebRTCSupported = function () {
 		return true;
 	};
 	
-	class_1.prototype.isBrowserSupported = function () {
+	Supports.prototype.isBrowserSupported = function () {
 		var browser = this.getBrowser();
 		var version = this.getVersion();
 		var validBrowser = this.supportedBrowsers.includes(browser);
@@ -27,15 +28,15 @@ const Supports = new (function () {
 		return false;
 	};
 
-	class_1.prototype.getBrowser = function () {
+	Supports.prototype.getBrowser = function () {
 		return "Node";
 	};
 
-	class_1.prototype.getVersion = function () {
+	Supports.prototype.getVersion = function () {
 		return 1000 || 0;
 	};
 
-	class_1.prototype.isUnifiedPlanSupported = function () {
+	Supports.prototype.isUnifiedPlanSupported = function () {
 		var browser = this.getBrowser();
 		var version = 1000 || 0;
 		if (browser === 'chrome' && version < 72)
@@ -58,11 +59,10 @@ const Supports = new (function () {
 		return supported;
 	};
 
-	class_1.prototype.toString = function () {
+	Supports.prototype.toString = function () {
 		return "Supports: \n    browser:" + this.getBrowser() + " \n    version:" + this.getVersion() + " \n    isIOS:" + this.isIOS + " \n    isWebRTCSupported:" + this.isWebRTCSupported() + " \n    isBrowserSupported:" + this.isBrowserSupported() + " \n    isUnifiedPlanSupported:" + this.isUnifiedPlanSupported();
 	};
 
-	return class_1;
+	return Supports;
+	
 }());
-
-export { Supports };

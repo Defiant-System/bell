@@ -1,17 +1,10 @@
 
-import * as Utils from "./utils.js";
-import { Logger } from "./Logger.js";
-import { Negotiator } from "./Negotiator.js"
-import { BaseConnection } from "./BaseConnection.js"
-import { ConnectionType, ConnectionEventType, ServerMessageType } from "./enums.js";
-
-
 /**
  * Wraps the streaming interface between two Peers.
  */
 var MediaConnection = (function (_super) {
 
-	Utils.__extends(MediaConnection, _super);
+	__extends(MediaConnection, _super);
 
 	function MediaConnection(peerId, provider, options) {
 		var _this = _super.call(this, peerId, provider, options) || this;
@@ -31,7 +24,7 @@ var MediaConnection = (function (_super) {
 
 	Object.defineProperty(MediaConnection.prototype, "type", {
 		get: function () {
-			return ConnectionType.Media;
+			return Enums.ConnectionType.Media;
 		},
 		enumerable: true,
 		configurable: true
@@ -52,19 +45,19 @@ var MediaConnection = (function (_super) {
 	MediaConnection.prototype.addStream = function (remoteStream) {
 		Logger.log("Receiving stream", remoteStream);
 		this._remoteStream = remoteStream;
-		_super.prototype.emit.call(this, ConnectionEventType.Stream, remoteStream); // Should we call this `open`?
+		_super.prototype.emit.call(this, Enums.ConnectionEventType.Stream, remoteStream); // Should we call this `open`?
 	};
 
 	MediaConnection.prototype.handleMessage = function (message) {
 		var type = message.type;
 		var payload = message.payload;
 		switch (message.type) {
-			case ServerMessageType.Answer:
+			case Enums.ServerMessageType.Answer:
 				// Forward to negotiator
 				this._negotiator.handleSDP(type, payload.sdp);
 				this._open = true;
 				break;
-			case ServerMessageType.Candidate:
+			case Enums.ServerMessageType.Candidate:
 				this._negotiator.handleCandidate(payload.candidate);
 				break;
 			default:
@@ -84,11 +77,11 @@ var MediaConnection = (function (_super) {
 		if (options && options.sdpTransform) {
 			this.options.sdpTransform = options.sdpTransform;
 		}
-		this._negotiator.startConnection(Utils.__assign(Utils.__assign({}, this.options._payload), { _stream: stream }));
+		this._negotiator.startConnection(__assign(__assign({}, this.options._payload), { _stream: stream }));
 		// Retrieve lost messages stored because PeerConnection not set up.
 		var messages = this.provider._getMessages(this.connectionId);
 		try {
-			for (var messages_1 = Utils.__values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
+			for (var messages_1 = __values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
 				var message = messages_1_1.value;
 				this.handleMessage(message);
 			}
@@ -125,7 +118,7 @@ var MediaConnection = (function (_super) {
 			return;
 		}
 		this._open = false;
-		_super.prototype.emit.call(this, ConnectionEventType.Close);
+		_super.prototype.emit.call(this, Enums.ConnectionEventType.Close);
 	};
 	
 	MediaConnection.ID_PREFIX = "mc_";
@@ -133,5 +126,3 @@ var MediaConnection = (function (_super) {
 	return MediaConnection;
 
 }(BaseConnection));
-
-export { MediaConnection };

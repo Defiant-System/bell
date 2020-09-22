@@ -1,16 +1,11 @@
 
-import * as Utils from "./utils.js"
-import { EventEmitter } from "./EventEmitter.js";
-import { Logger } from "./Logger.js";
-import { SocketEventType, ServerMessageType } from "./enums.js";
-
 /**
  * An abstraction on top of WebSockets to provide fastest
  * possible connection for peers.
  */
 var Socket = (function (_super) {
 	
-	Utils.__extends(Socket, _super);
+	__extends(Socket, _super);
 
 	function Socket(secure, host, port, path, key, pingInterval) {
 		if (pingInterval === void 0) { pingInterval = 5000; }
@@ -43,7 +38,7 @@ var Socket = (function (_super) {
 				Logger.log("Invalid server message", event.data);
 				return;
 			}
-			_this.emit(SocketEventType.Message, data);
+			_this.emit(Enums.SocketEventType.Message, data);
 		};
 		this._socket.onclose = function (event) {
 			if (_this._disconnected) {
@@ -52,7 +47,7 @@ var Socket = (function (_super) {
 			Logger.log("Socket closed.", event);
 			_this._cleanup();
 			_this._disconnected = true;
-			_this.emit(SocketEventType.Disconnected);
+			_this.emit(Enums.SocketEventType.Disconnected);
 		};
 		// Take care of the queue of connections if necessary and make sure Peer knows
 		// socket is open.
@@ -78,7 +73,7 @@ var Socket = (function (_super) {
 			Logger.log("Cannot send heartbeat, because socket closed");
 			return;
 		}
-		var message = JSON.stringify({ type: ServerMessageType.Heartbeat });
+		var message = JSON.stringify({ type: Enums.ServerMessageType.Heartbeat });
 		this._socket.send(message);
 		this._scheduleHeartbeat();
 	};
@@ -93,10 +88,10 @@ var Socket = (function (_super) {
 		var e_1, _a;
 		//Create copy of queue and clear it,
 		//because send method push the message back to queue if smth will go wrong
-		var copiedQueue = Utils.__spread(this._messagesQueue);
+		var copiedQueue = __spread(this._messagesQueue);
 		this._messagesQueue = [];
 		try {
-			for (var copiedQueue_1 = Utils.__values(copiedQueue), copiedQueue_1_1 = copiedQueue_1.next(); !copiedQueue_1_1.done; copiedQueue_1_1 = copiedQueue_1.next()) {
+			for (var copiedQueue_1 = __values(copiedQueue), copiedQueue_1_1 = copiedQueue_1.next(); !copiedQueue_1_1.done; copiedQueue_1_1 = copiedQueue_1.next()) {
 				var message = copiedQueue_1_1.value;
 				this.send(message);
 			}
@@ -122,7 +117,7 @@ var Socket = (function (_super) {
 			return;
 		}
 		if (!data.type) {
-			this.emit(SocketEventType.Error, "Invalid message");
+			this.emit(Enums.SocketEventType.Error, "Invalid message");
 			return;
 		}
 		if (!this._wsOpen()) {
@@ -152,5 +147,3 @@ var Socket = (function (_super) {
 	return Socket;
 
 }(EventEmitter));
-
-export { Socket };

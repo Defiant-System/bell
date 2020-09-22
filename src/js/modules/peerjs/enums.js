@@ -62,13 +62,3 @@ const ServerMessageType = {
 	Leave: "LEAVE",
 	Expire: "EXPIRE",
 };
-
-export {
-	ConnectionEventType,
-	ConnectionType,
-	PeerEventType,
-	PeerErrorType,
-	SerializationType,
-	SocketEventType,
-	ServerMessageType,
-};

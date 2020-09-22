@@ -917,7 +917,6 @@ var API = (function () {
 
 	/** Get a unique ID from the server via XHR and initialize with it. */
 	API.prototype.retrieveId = function () {
-		console.log(window);
 		return __awaiter(this, void 0, void 0, function () {
 			var url, response, error_1, pathError;
 			return __generator(this, function (_a) {

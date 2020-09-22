@@ -1,23 +1,7 @@
 
-import * as Utils from "./utils.js"
-import { API } from "./api.js";
-import { EventEmitter } from "./EventEmitter.js";
-import { Logger } from "./Logger.js";
-import { Socket } from "./Socket.js";
-import { MediaConnection } from "./MediaConnection.js";
-import { DataConnection } from "./DataConnection.js";
-import {
-	PeerErrorType,
-	SocketEventType,
-	ServerMessageType,
-	PeerEventType,
-	ConnectionType
-} from "./enums.js";
-
-
 const Peer = (function (_super) {
 
-	Utils.__extends(Peer, _super);
+	__extends(Peer, _super);
 
 	function Peer(id, options) {
 		var _this = _super.call(this) || this;
@@ -40,7 +24,7 @@ const Peer = (function (_super) {
 		}
 
 		// Configurize options
-		options = Utils.__assign({
+		options = __assign({
 				debug: 0,
 				host: Utils.util.CLOUD_HOST,
 				port: Utils.util.CLOUD_PORT,
@@ -89,13 +73,13 @@ const Peer = (function (_super) {
 		// Sanity checks
 		// Ensure WebRTC supported
 		if (!Utils.util.supports.audioVideo && !Utils.util.supports.data) {
-			_this._delayedAbort(PeerErrorType.BrowserIncompatible, "The current browser does not support WebRTC");
+			_this._delayedAbort(Enums.PeerErrorType.BrowserIncompatible, "The current browser does not support WebRTC");
 			return _this;
 		}
 
 		// Ensure alphanumeric id
 		if (!!userId && !Utils.util.validateId(userId)) {
-			_this._delayedAbort(PeerErrorType.InvalidID, "ID \"" + userId + "\" is invalid");
+			_this._delayedAbort(Enums.PeerErrorType.InvalidID, "ID \"" + userId + "\" is invalid");
 			return _this;
 		}
 
@@ -104,7 +88,7 @@ const Peer = (function (_super) {
 		} else {
 			_this._api.retrieveId()
 				.then(function (id) { return _this._initialize(id); })
-				.catch(function (error) { return _this._abort(PeerErrorType.ServerError, error); });
+				.catch(function (error) { return _this._abort(Enums.PeerErrorType.ServerError, error); });
 		}
 
 		return _this;
@@ -151,8 +135,8 @@ const Peer = (function (_super) {
 			var e_1, _a;
 			var plainConnections = Object.create(null);
 			try {
-				for (var _b = Utils.__values(this._connections), _c = _b.next(); !_c.done; _c = _b.next()) {
-					var _d = Utils.__read(_c.value, 2), k = _d[0], v = _d[1];
+				for (var _b = __values(this._connections), _c = _b.next(); !_c.done; _c = _b.next()) {
+					var _d = __read(_c.value, 2), k = _d[0], v = _d[1];
 					plainConnections[k] = v;
 				}
 			}
@@ -196,27 +180,27 @@ const Peer = (function (_super) {
 			this._options.pingInterval
 		);
 		
-		socket.on(SocketEventType.Message, function (data) {
+		socket.on(Enums.SocketEventType.Message, function (data) {
 			_this._handleMessage(data);
 		});
 
-		socket.on(SocketEventType.Error, function (error) {
-			_this._abort(PeerErrorType.SocketError, error);
+		socket.on(Enums.SocketEventType.Error, function (error) {
+			_this._abort(Enums.PeerErrorType.SocketError, error);
 		});
 
-		socket.on(SocketEventType.Disconnected, function () {
+		socket.on(Enums.SocketEventType.Disconnected, function () {
 			if (_this.disconnected) {
 				return;
 			}
-			_this.emitError(PeerErrorType.Network, "Lost connection to server.");
+			_this.emitError(Enums.PeerErrorType.Network, "Lost connection to server.");
 			_this.disconnect();
 		});
 
-		socket.on(SocketEventType.Close, function () {
+		socket.on(Enums.SocketEventType.Close, function () {
 			if (_this.disconnected) {
 				return;
 			}
-			_this._abort(PeerErrorType.SocketClosed, "Underlying socket is already closed.");
+			_this._abort(Enums.PeerErrorType.SocketClosed, "Underlying socket is already closed.");
 		});
 		return socket;
 	};
@@ -234,29 +218,29 @@ const Peer = (function (_super) {
 		var payload = message.payload;
 		var peerId = message.src;
 		switch (type) {
-			case ServerMessageType.Open: // The connection to the server is open.
+			case Enums.ServerMessageType.Open: // The connection to the server is open.
 				this._lastServerId = this.id;
 				this._open = true;
-				this.emit(PeerEventType.Open, this.id);
+				this.emit(Enums.PeerEventType.Open, this.id);
 				break;
-			case ServerMessageType.Error: // Server error.
-				this._abort(PeerErrorType.ServerError, payload.msg);
+			case Enums.ServerMessageType.Error: // Server error.
+				this._abort(Enums.PeerErrorType.ServerError, payload.msg);
 				break;
-			case ServerMessageType.IdTaken: // The selected ID is taken.
-				this._abort(PeerErrorType.UnavailableID, "ID \"" + this.id + "\" is taken");
+			case Enums.ServerMessageType.IdTaken: // The selected ID is taken.
+				this._abort(Enums.PeerErrorType.UnavailableID, "ID \"" + this.id + "\" is taken");
 				break;
-			case ServerMessageType.InvalidKey: // The given API key cannot be found.
-				this._abort(PeerErrorType.InvalidKey, "API KEY \"" + this._options.key + "\" is invalid");
+			case Enums.ServerMessageType.InvalidKey: // The given API key cannot be found.
+				this._abort(Enums.PeerErrorType.InvalidKey, "API KEY \"" + this._options.key + "\" is invalid");
 				break;
-			case ServerMessageType.Leave: // Another peer has closed its connection to this peer.
+			case Enums.ServerMessageType.Leave: // Another peer has closed its connection to this peer.
 				Logger.log("Received leave message from " + peerId);
 				this._cleanupPeer(peerId);
 				this._connections.delete(peerId);
 				break;
-			case ServerMessageType.Expire: // The offer sent to a peer has expired without response.
-				this.emitError(PeerErrorType.PeerUnavailable, "Could not connect to peer " + peerId);
+			case Enums.ServerMessageType.Expire: // The offer sent to a peer has expired without response.
+				this.emitError(Enums.PeerErrorType.PeerUnavailable, "Could not connect to peer " + peerId);
 				break;
-			case ServerMessageType.Offer: {
+			case Enums.ServerMessageType.Offer: {
 				// we should consider switching this to CALL/CONNECT, but this is the least breaking option.
 				var connectionId = payload.connectionId;
 				var connection = this.getConnection(peerId, connectionId);
@@ -265,16 +249,16 @@ const Peer = (function (_super) {
 					Logger.warn("Offer received for existing Connection ID:" + connectionId);
 				}
 				// Create a new connection.
-				if (payload.type === ConnectionType.Media) {
+				if (payload.type === Enums.ConnectionType.Media) {
 					connection = new MediaConnection(peerId, this, {
 						connectionId: connectionId,
 						_payload: payload,
 						metadata: payload.metadata
 					});
 					this._addConnection(peerId, connection);
-					this.emit(PeerEventType.Call, connection);
+					this.emit(Enums.PeerEventType.Call, connection);
 				}
-				else if (payload.type === ConnectionType.Data) {
+				else if (payload.type === Enums.ConnectionType.Data) {
 					connection = new DataConnection(peerId, this, {
 						connectionId: connectionId,
 						_payload: payload,
@@ -284,7 +268,7 @@ const Peer = (function (_super) {
 						reliable: payload.reliable
 					});
 					this._addConnection(peerId, connection);
-					this.emit(PeerEventType.Connection, connection);
+					this.emit(Enums.PeerEventType.Connection, connection);
 				}
 				else {
 					Logger.warn("Received malformed connection type:" + payload.type);
@@ -293,7 +277,7 @@ const Peer = (function (_super) {
 				// Find messages.
 				var messages = this._getMessages(connectionId);
 				try {
-					for (var messages_1 = Utils.__values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
+					for (var messages_1 = __values(messages), messages_1_1 = messages_1.next(); !messages_1_1.done; messages_1_1 = messages_1.next()) {
 						var message_1 = messages_1_1.value;
 						connection.handleMessage(message_1);
 					}
@@ -360,7 +344,7 @@ const Peer = (function (_super) {
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect, or call reconnect " +
 				"on this peer if you believe its ID to still be available.");
-			this.emitError(PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
+			this.emitError(Enums.PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
 			return;
 		}
 		var dataConnection = new DataConnection(peer, this, options);
@@ -378,7 +362,7 @@ const Peer = (function (_super) {
 			Logger.warn("You cannot connect to a new Peer because you called " +
 				".disconnect() on this Peer and ended your connection with the " +
 				"server. You can create a new Peer to reconnect.");
-			this.emitError(PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
+			this.emitError(Enums.PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
 			return;
 		}
 		if (!stream) {
@@ -421,7 +405,7 @@ const Peer = (function (_super) {
 			return null;
 		}
 		try {
-			for (var connections_1 = Utils.__values(connections), connections_1_1 = connections_1.next(); !connections_1_1.done; connections_1_1 = connections_1.next()) {
+			for (var connections_1 = __values(connections), connections_1_1 = connections_1.next(); !connections_1_1.done; connections_1_1 = connections_1.next()) {
 				var connection = connections_1_1.value;
 				if (connection.connectionId === connectionId) {
 					return connection;
@@ -472,7 +456,7 @@ const Peer = (function (_super) {
 			error = err;
 		}
 		error.type = type;
-		this.emit(PeerEventType.Error, error);
+		this.emit(Enums.PeerEventType.Error, error);
 	};
 
 	/**
@@ -489,14 +473,14 @@ const Peer = (function (_super) {
 		this.disconnect();
 		this._cleanup();
 		this._destroyed = true;
-		this.emit(PeerEventType.Close);
+		this.emit(Enums.PeerEventType.Close);
 	};
 
 	/** Disconnects every connection on this peer. */
 	Peer.prototype._cleanup = function () {
 		var e_4, _a;
 		try {
-			for (var _b = Utils.__values(this._connections.keys()), _c = _b.next(); !_c.done; _c = _b.next()) {
+			for (var _b = __values(this._connections.keys()), _c = _b.next(); !_c.done; _c = _b.next()) {
 				var peerId = _c.value;
 				this._cleanupPeer(peerId);
 				this._connections.delete(peerId);
@@ -519,7 +503,7 @@ const Peer = (function (_super) {
 		if (!connections)
 			return;
 		try {
-			for (var connections_2 = Utils.__values(connections), connections_2_1 = connections_2.next(); !connections_2_1.done; connections_2_1 = connections_2.next()) {
+			for (var connections_2 = __values(connections), connections_2_1 = connections_2.next(); !connections_2_1.done; connections_2_1 = connections_2.next()) {
 				var connection = connections_2_1.value;
 				connection.close();
 			}
@@ -550,7 +534,7 @@ const Peer = (function (_super) {
 		this.socket.close();
 		this._lastServerId = currentId;
 		this._id = null;
-		this.emit(PeerEventType.Disconnected, currentId);
+		this.emit(Enums.PeerEventType.Disconnected, currentId);
 	};
 
 	/** Attempts to reconnect with the same ID. */
@@ -583,7 +567,7 @@ const Peer = (function (_super) {
 		if (cb === void 0) { cb = function (_) { }; }
 		this._api.listAllPeers()
 			.then(function (peers) { return cb(peers); })
-			.catch(function (error) { return _this._abort(PeerErrorType.ServerError, error); });
+			.catch(function (error) { return _this._abort(Enums.PeerErrorType.ServerError, error); });
 	};
 
 	Peer.DEFAULT_KEY = "peerjs";
@@ -591,5 +575,3 @@ const Peer = (function (_super) {
 	return Peer;
 
 }(EventEmitter));
-
-export { Peer };

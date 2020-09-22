@@ -1,18 +1,16 @@
 
-import { BinaryPack } from "./BinaryPack.js";
-import { Supports } from "./Supports.js";
-
-const DEFAULT_CONFIG = {
-	iceServers: [
-		{ urls: "stun:stun.l.google.com:19302" },
-		{ urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
-	],
-	sdpSemantics: "unified-plan"
-};
-
 
 const util = new (function () {
-	function class_1() {
+	
+	const DEFAULT_CONFIG = {
+		iceServers: [
+			{ urls: "stun:stun.l.google.com:19302" },
+			{ urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
+		],
+		sdpSemantics: "unified-plan"
+	};
+
+	function Util() {
 		this.CLOUD_HOST = "0.peerjs.com";
 		this.CLOUD_PORT = 443;
 		// Browsers that need chunking:
@@ -75,15 +73,15 @@ const util = new (function () {
 		this._dataCount = 1;
 	}
 
-	class_1.prototype.noop = function () { };
+	Util.prototype.noop = function () { };
 
 	// Ensure alphanumeric ids
-	class_1.prototype.validateId = function (id) {
+	Util.prototype.validateId = function (id) {
 		// Allow empty ids
 		return !id || /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(id);
 	};
 
-	class_1.prototype.chunk = function (blob) {
+	Util.prototype.chunk = function (blob) {
 		var chunks = [];
 		var size = blob.size;
 		var total = Math.ceil(size / exports.util.chunkedMTU);
@@ -106,7 +104,7 @@ const util = new (function () {
 		return chunks;
 	};
 
-	class_1.prototype.blobToArrayBuffer = function (blob, cb) {
+	Util.prototype.blobToArrayBuffer = function (blob, cb) {
 		var fr = new FileReader();
 		fr.onload = function (evt) {
 			if (evt.target) {
@@ -117,7 +115,7 @@ const util = new (function () {
 		return fr;
 	};
 
-	class_1.prototype.binaryStringToArrayBuffer = function (binary) {
+	Util.prototype.binaryStringToArrayBuffer = function (binary) {
 		var byteArray = new Uint8Array(binary.length);
 		for (var i = 0; i < binary.length; i++) {
 			byteArray[i] = binary.charCodeAt(i) & 0xff;
@@ -125,19 +123,18 @@ const util = new (function () {
 		return byteArray.buffer;
 	};
 
-	class_1.prototype.randomToken = function () {
+	Util.prototype.randomToken = function () {
 		return Math.random()
 			.toString(36)
 			.substr(2);
 	};
 
-	class_1.prototype.isSecure = function () {
+	Util.prototype.isSecure = function () {
 		return true;
 	};
 
-	return class_1;
+	return Util;
 }());
-
 
 
 var __awaiter = function (thisArg, _arguments, P, generator) {
@@ -238,16 +235,3 @@ var __assign = function () {
 	return __assign.apply(this, arguments);
 };
 
-
-
-
-export {
-	util,
-	__awaiter,
-	__generator,
-	__extends,
-	__assign,
-	__read,
-	__spread,
-	__values,
-};

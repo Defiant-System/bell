@@ -1,26 +1,24 @@
 
-import * as Utils from "./utils.js"
-
-var LOG_PREFIX = 'PeerJS: ';
-/*
-Prints log messages depending on the debug level passed in. Defaults to 0.
-0  Prints no logs.
-1  Prints only errors.
-2  Prints errors and warnings.
-3  Prints all logs.
-*/
-var LogLevel = {
-	"0": "Disabled",
-	"1": "Errors",
-	"2": "Warnings",
-	"3": "All",
-	"Disabled": "0",
-	"Errors": "1",
-	"Warnings": "2",
-	"All": "3",
-};
-
 var LoggerClass = (function () {
+	
+	var LOG_PREFIX = 'PeerJS: ';
+	/*
+	Prints log messages depending on the debug level passed in. Defaults to 0.
+	0  Prints no logs.
+	1  Prints only errors.
+	2  Prints errors and warnings.
+	3  Prints all logs.
+	*/
+	var LogLevel = {
+		"0": "Disabled",
+		"1": "Errors",
+		"2": "Warnings",
+		"3": "All",
+		"Disabled": "0",
+		"Errors": "1",
+		"Warnings": "2",
+		"All": "3",
+	};
 
 	function Logger() {
 		this._logLevel = LogLevel.Disabled;
@@ -39,7 +37,7 @@ var LoggerClass = (function () {
 			args[_i] = arguments[_i];
 		}
 		if (this._logLevel >= LogLevel.All) {
-			this._print.apply(this, Utils.__spread([LogLevel.All], args));
+			this._print.apply(this, __spread([LogLevel.All], args));
 		}
 	};
 
@@ -49,7 +47,7 @@ var LoggerClass = (function () {
 			args[_i] = arguments[_i];
 		}
 		if (this._logLevel >= LogLevel.Warnings) {
-			this._print.apply(this, Utils.__spread([LogLevel.Warnings], args));
+			this._print.apply(this, __spread([LogLevel.Warnings], args));
 		}
 	};
 
@@ -59,7 +57,7 @@ var LoggerClass = (function () {
 			args[_i] = arguments[_i];
 		}
 		if (this._logLevel >= LogLevel.Errors) {
-			this._print.apply(this, Utils.__spread([LogLevel.Errors], args));
+			this._print.apply(this, __spread([LogLevel.Errors], args));
 		}
 	};
 
@@ -72,20 +70,20 @@ var LoggerClass = (function () {
 		for (var _i = 1; _i < arguments.length; _i++) {
 			rest[_i - 1] = arguments[_i];
 		}
-		var copy = Utils.__spread([LOG_PREFIX], rest);
+		var copy = __spread([LOG_PREFIX], rest);
 		for (var i in copy) {
 			if (copy[i] instanceof Error) {
 				copy[i] = "(" + copy[i].name + ") " + copy[i].message;
 			}
 		}
 		if (logLevel >= LogLevel.All) {
-			console.log.apply(console, Utils.__spread(copy));
+			console.log.apply(console, __spread(copy));
 		}
 		else if (logLevel >= LogLevel.Warnings) {
-			console.warn.apply(console, Utils.__spread(["WARNING"], copy));
+			console.warn.apply(console, __spread(["WARNING"], copy));
 		}
 		else if (logLevel >= LogLevel.Errors) {
-			console.error.apply(console, Utils.__spread(["ERROR"], copy));
+			console.error.apply(console, __spread(["ERROR"], copy));
 		}
 	};
 
@@ -95,4 +93,3 @@ var LoggerClass = (function () {
 
 let Logger = new LoggerClass();
 
-export { Logger };

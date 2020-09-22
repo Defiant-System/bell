@@ -1,8 +1,4 @@
 
-import * as Utils from "./utils.js";
-import { Logger } from "./Logger.js";
-
-
 var API = (function () {
 
 	function API(_options) {
@@ -26,10 +22,9 @@ var API = (function () {
 
 	/** Get a unique ID from the server via XHR and initialize with it. */
 	API.prototype.retrieveId = function () {
-		console.log(window);
-		return Utils.__awaiter(this, void 0, void 0, function () {
+		return __awaiter(this, void 0, void 0, function () {
 			var url, response, error_1, pathError;
-			return Utils.__generator(this, function (_a) {
+			return __generator(this, function (_a) {
 				switch (_a.label) {
 					case 0:
 						url = this._buildUrl("id");
@@ -63,9 +58,9 @@ var API = (function () {
 
 	/** @deprecated */
 	API.prototype.listAllPeers = function () {
-		return Utils.__awaiter(this, void 0, void 0, function () {
+		return __awaiter(this, void 0, void 0, function () {
 			var url, response, helpfulError, error_2;
-			return Utils.__generator(this, function (_a) {
+			return __generator(this, function (_a) {
 				switch (_a.label) {
 					case 0:
 						url = this._buildUrl("peers");
@@ -107,5 +102,3 @@ var API = (function () {
 	return API;
 
 }());
-
-export { API };

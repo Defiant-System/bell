@@ -1,10 +1,7 @@
 
-import * as Utils from "./utils.js";
-import { EventEmitter } from "./EventEmitter.js";
-
 var BaseConnection = (function (_super) {
 
-	Utils.__extends(BaseConnection, _super);
+	__extends(BaseConnection, _super);
 	
 	function BaseConnection(peer, provider, options) {
 		var _this = _super.call(this) || this;
@@ -27,5 +24,3 @@ var BaseConnection = (function (_super) {
 	return BaseConnection;
 
 }(EventEmitter));
-
-export { BaseConnection };
