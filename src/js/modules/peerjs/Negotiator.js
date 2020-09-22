@@ -83,7 +83,7 @@ var Negotiator = (function () {
 					_this.connection.close();
 					break;
 				case "completed":
-					peerConnection.onicecandidate = Utils.util.noop;
+					peerConnection.onicecandidate = util.noop;
 					break;
 			}
 			_this.connection.emit(Enums.ConnectionEventType.IceStateChanged, peerConnection.iceConnectionState);
@@ -164,11 +164,12 @@ var Negotiator = (function () {
 							type: this.connection.type,
 							connectionId: this.connection.connectionId,
 							metadata: this.connection.metadata,
-							browser: Utils.util.browser
+							browser: util.browser
 						};
 						if (this.connection.type === Enums.ConnectionType.Data) {
 							dataConnection = this.connection;
-							payload = __assign(__assign({}, payload), { label: dataConnection.label, reliable: dataConnection.reliable, serialization: dataConnection.serialization });
+
+							payload = Object.assign(Object.assign({}, payload), { label: dataConnection.label, reliable: dataConnection.reliable, serialization: dataConnection.serialization });
 						}
 						provider.socket.send({
 							type: Enums.ServerMessageType.Offer,
@@ -228,7 +229,7 @@ var Negotiator = (function () {
 								sdp: answer,
 								type: this.connection.type,
 								connectionId: this.connection.connectionId,
-								browser: Utils.util.browser
+								browser: util.browser
 							},
 							dst: this.connection.peer
 						});

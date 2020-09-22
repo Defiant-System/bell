@@ -4,7 +4,6 @@ defiant.require("./peerjs/Supports.js");
 defiant.require("./peerjs/utils.js");
 defiant.require("./peerjs/enums.js");
 defiant.require("./peerjs/EventEmitter.js");
-
 defiant.require("./peerjs/api.js");
 defiant.require("./peerjs/Peer.js");
 defiant.require("./peerjs/Negotiator.js");

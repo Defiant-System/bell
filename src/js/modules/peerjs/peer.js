@@ -24,16 +24,16 @@ const Peer = (function (_super) {
 		}
 
 		// Configurize options
-		options = __assign({
+		options = Object.assign({
 				debug: 0,
-				host: Utils.util.CLOUD_HOST,
-				port: Utils.util.CLOUD_PORT,
+				host: util.CLOUD_HOST,
+				port: util.CLOUD_PORT,
 				path: "/",
 				key: Peer.DEFAULT_KEY,
-				token: Utils.util.randomToken(),
-				config: Utils.util.defaultConfig
+				token: util.randomToken(),
+				config: util.defaultConfig
 			}, options);
-
+		
 		_this._options = options;
 
 		// Detect relative URL host.
@@ -56,9 +56,9 @@ const Peer = (function (_super) {
 		}
 
 		// Set whether we use SSL to same as current host
-		if (_this._options.secure === undefined && _this._options.host !== Utils.util.CLOUD_HOST) {
-			_this._options.secure = Utils.util.isSecure();
-		} else if (_this._options.host == Utils.util.CLOUD_HOST) {
+		if (_this._options.secure === undefined && _this._options.host !== util.CLOUD_HOST) {
+			_this._options.secure = util.isSecure();
+		} else if (_this._options.host == util.CLOUD_HOST) {
 			_this._options.secure = true;
 		}
 
@@ -72,13 +72,13 @@ const Peer = (function (_super) {
 		_this._socket = _this._createServerConnection();
 		// Sanity checks
 		// Ensure WebRTC supported
-		if (!Utils.util.supports.audioVideo && !Utils.util.supports.data) {
+		if (!util.supports.audioVideo && !util.supports.data) {
 			_this._delayedAbort(Enums.PeerErrorType.BrowserIncompatible, "The current browser does not support WebRTC");
 			return _this;
 		}
 
 		// Ensure alphanumeric id
-		if (!!userId && !Utils.util.validateId(userId)) {
+		if (!!userId && !util.validateId(userId)) {
 			_this._delayedAbort(Enums.PeerErrorType.InvalidID, "ID \"" + userId + "\" is invalid");
 			return _this;
 		}

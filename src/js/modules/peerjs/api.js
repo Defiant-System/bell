@@ -8,13 +8,10 @@ var API = (function () {
 	API.prototype._buildUrl = function (method) {
 		var protocol = this._options.secure ? "https://" : "http://";
 		var url = protocol +
-			this._options.host +
-			":" +
+			this._options.host + ":" +
 			this._options.port +
 			this._options.path +
-			this._options.key +
-			"/" +
-			method;
+			this._options.key +"/"+ method;
 		var queryString = "?ts=" + new Date().getTime() + "" + Math.random();
 		url += queryString;
 		return url;
@@ -31,7 +28,7 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, fetch(url)];
+						return [4 /*yield*/, window.fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {
@@ -43,7 +40,7 @@ var API = (function () {
 						Logger.error("Error retrieving ID", error_1);
 						pathError = "";
 						if (this._options.path === "/" &&
-							this._options.host !== Utils.util.CLOUD_HOST) {
+							this._options.host !== util.CLOUD_HOST) {
 							pathError =
 								" If you passed in a `path` to your self-hosted PeerServer, " +
 									"you'll also need to pass in that same path when creating a new " +
@@ -67,18 +64,17 @@ var API = (function () {
 						_a.label = 1;
 					case 1:
 						_a.trys.push([1, 3, , 4]);
-						return [4 /*yield*/, fetch(url)];
+						return [4 /*yield*/, window.fetch(url)];
 					case 2:
 						response = _a.sent();
 						if (response.status !== 200) {
 							if (response.status === 401) {
 								helpfulError = "";
-								if (this._options.host === Utils.util.CLOUD_HOST) {
+								if (this._options.host === util.CLOUD_HOST) {
 									helpfulError =
 										"It looks like you're using the cloud server. You can email " +
 											"team@peerjs.com to enable peer listing for your API key.";
-								}
-								else {
+								} else {
 									helpfulError =
 										"You need to enable `allow_discovery` on your self-hosted " +
 											"PeerServer to use this feature.";

@@ -11,7 +11,7 @@ var MediaConnection = (function (_super) {
 		_this._localStream = _this.options._stream;
 		_this.connectionId =
 			_this.options.connectionId ||
-				MediaConnection.ID_PREFIX + Utils.util.randomToken();
+				MediaConnection.ID_PREFIX + util.randomToken();
 		_this._negotiator = new Negotiator(_this);
 		if (_this._localStream) {
 			_this._negotiator.startConnection({
@@ -77,7 +77,9 @@ var MediaConnection = (function (_super) {
 		if (options && options.sdpTransform) {
 			this.options.sdpTransform = options.sdpTransform;
 		}
-		this._negotiator.startConnection(__assign(__assign({}, this.options._payload), { _stream: stream }));
+
+		this._negotiator.startConnection(Object.assign(Object.assign({}, this.options._payload), { _stream: stream }));
+
 		// Retrieve lost messages stored because PeerConnection not set up.
 		var messages = this.provider._getMessages(this.connectionId);
 		try {
