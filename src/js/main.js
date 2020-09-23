@@ -8,9 +8,8 @@ const UUID = $.uuidv4();
 
 
 //console.log(Peer);
-let myPeer = new Peer(UUID, { host: "/", port: "40100" });
-console.log(myPeer);
-
+// const myPeer = new Peer(UUID, { host: "/", port: "40700" });
+// console.log(myPeer);
 
 
 const facetime = {
@@ -24,8 +23,11 @@ const facetime = {
 			callList: window.find(".call-list"),
 			videoCall: window.find(".video-call"),
 			videoMe: window.find(".me video"),
-			videoOther: window.find(".other video"),
+			videoOther: window.find(".other"),
 		};
+
+		// init auxilliary objects
+		Call.init();
 
 		window.bluePrint.selectNodes("//History/i").map(call => {
 			let timestamp = defiant.moment(+call.getAttribute("stamp"));
@@ -35,9 +37,14 @@ const facetime = {
 		// auto click "all" tab
 		window.find(".tab-row > div[data-arg='all']").trigger("click");
 
-		// if (ME === "bill") {
-		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
-		// }
+		// auto mute video elements
+		this.els.content.find("video").map(el => { el.muted = true; });
+
+		// console.log( defiant.i18n("Calling") );
+
+		if (ME === "bill") {
+			window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
+		}
 	},
 	dispatch(event) {
 		let Self = facetime,
@@ -48,19 +55,15 @@ const facetime = {
 		switch (event.type) {
 			// system events
 			case "window.open":
-				return;
 				navigator.mediaDevices
-					.getUserMedia({
-						video: true,
-						audio: true
-					})
+					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
 						let video = Self.els.videoMe[0];
 						
 						Self.stream = stream;
 
 						video.srcObject = stream;
-						video.muted = true;
+						// video.muted = true;
 						video.addEventListener("loadedmetadata", () => {
 							video.play();
 						});
@@ -181,7 +184,7 @@ const facetime = {
 					action: "inititate",
 					from: ME,
 					to: user.username,
-					channel: `${type}-${$.uuidv4()}`,
+					channel: `${type}:${UUID}`,
 					message: `<b>${user.name}</b> is calling you.`,
 					options: [
 						{

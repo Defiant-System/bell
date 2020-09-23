@@ -14,8 +14,7 @@ var Socket = (function (_super) {
 		_this._disconnected = true;
 		_this._messagesQueue = [];
 		var wsProtocol = secure ? "wss://" : "ws://";
-		//_this._baseUrl = wsProtocol + host + ":" + port + path + "peer?key=" + key;
-		_this._baseUrl = "ws://localhost:40600/peerjs?key="+ key;
+		_this._baseUrl = wsProtocol + host + ":" + port + path + "peerjs?key=" + key;
 		return _this;
 	}
 

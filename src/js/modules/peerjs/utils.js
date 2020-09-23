@@ -49,8 +49,7 @@ const util = new (function () {
 					catch (e) {
 					}
 				}
-				catch (e) {
-				}
+				catch (e) {}
 				finally {
 					if (dc) {
 						dc.close();

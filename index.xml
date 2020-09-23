@@ -1,7 +1,4 @@
 <Application>
-	<Build>
-		<task action="skip" source="src/js/bundle.js" destination="public/js/bundle.js"/>
-	</Build>
 	<Head>
 		<meta name="id" value="facetime"/>
 		<meta name="title" value="Facetime" version="1.0"/>
@@ -24,5 +21,6 @@
 		@import "src/partials/menubar.xml"
 	</Head>
 
+	@import "public/i18n/en.xml"
 	@import "src/partials/data.xml"
 </Application>
