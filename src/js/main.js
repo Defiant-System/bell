@@ -33,9 +33,9 @@ const facetime = {
 		this.els.content.find("video").map(el => { el.muted = true; });
 
 
-		if (ME === "bill") {
-			window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
-		}
+		// if (ME === "bill") {
+		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
+		// }
 	},
 	dispatch(event) {
 		let Self = facetime,
