@@ -7,28 +7,31 @@ const Call = {
 	},
 	peer: {
 		connect() {
-			Call.connection = new Peer(UUID, { host: "/", port: "40700" });
-
-			Call.connection.on("call", Call.peer.receiveCall);
+			// establish connection
+			Call.connection = window.peer.connect({
+				// on events
+				call: this.receiveCall.bind(this)
+			});
+			
+			//Call.connection.on("call", this.receiveCall.bind(this));
 		},
-		call(user) {
-			Call.mediaConnection = Call.connection.call(user.uuid, facetime.stream);
+		call(user, stream) {
+			Call.mediaConnection = Call.connection.call(user.uuid, stream);
 
-			Call.mediaConnection.on("stream", Call.peer.receiveStream);
-			Call.mediaConnection.on("close", Call.peer.disconnect);
+			Call.mediaConnection.on("stream", this.receiveStream.bind(this));
+			Call.mediaConnection.on("close", this.disconnect.bind(this));
 		},
 		receiveCall(mediaConnection) {
 			Call.mediaConnection = mediaConnection;
 
 			mediaConnection.answer(facetime.stream);
-			mediaConnection.on("stream", Call.peer.receiveStream);
+			mediaConnection.on("stream", this.receiveStream.bind(this));
 		},
 		receiveStream(userStream) {
-			facetime.els.videoOther.find("video")[0].srcObject = userStream;
+			let videoEl = facetime.els.videoOther.find("video")[0];
 
-			facetime.els.videoOther.find("video")[0].addEventListener("loadedmetadata", () => {
-				facetime.els.videoOther.find("video")[0].play();
-			});
+			videoEl.srcObject = userStream;
+			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
 		},
 		disconnect() {
 			Call.mediaConnection.close();

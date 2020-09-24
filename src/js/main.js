@@ -1,13 +1,14 @@
 
-defiant.require("./bundle.js");
+//d1efiant.require("./bundle.js");
 defiant.require("modules/call.js");
 
 
 const ME = defiant.user.username;
-const UUID = $.uuidv4();
+//const UUID = $.uuidv4();
 
 
-//console.log(Peer);
+// let myPeer = window.peer.connect();
+// console.log(myPeer);
 // const myPeer = new Peer(UUID, { host: "/", port: "40700" });
 // console.log(myPeer);
 
@@ -55,6 +56,7 @@ const facetime = {
 		switch (event.type) {
 			// system events
 			case "window.open":
+				// return;
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
@@ -184,7 +186,7 @@ const facetime = {
 					action: "inititate",
 					from: ME,
 					to: user.username,
-					channel: `${type}:${UUID}`,
+					channel: `${type}:${window.peer.id}`,
 					message: `<b>${user.name}</b> is calling you.`,
 					options: [
 						{
