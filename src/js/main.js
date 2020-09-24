@@ -1,17 +1,8 @@
 
-//d1efiant.require("./bundle.js");
 defiant.require("modules/call.js");
 
 
 const ME = defiant.user.username;
-//const UUID = $.uuidv4();
-
-
-// let myPeer = window.peer.connect();
-// console.log(myPeer);
-// const myPeer = new Peer(UUID, { host: "/", port: "40700" });
-// console.log(myPeer);
-
 
 const facetime = {
 	els: {},
@@ -41,7 +32,6 @@ const facetime = {
 		// auto mute video elements
 		this.els.content.find("video").map(el => { el.muted = true; });
 
-		// console.log( defiant.i18n("Calling") );
 
 		if (ME === "bill") {
 			window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
@@ -56,7 +46,7 @@ const facetime = {
 		switch (event.type) {
 			// system events
 			case "window.open":
-				// return;
+				return;
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
