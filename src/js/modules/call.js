@@ -34,7 +34,9 @@ const Call = {
 			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
 		},
 		disconnect() {
-			Call.mediaConnection.close();
+			if (Call.mediaConnection) {
+				Call.mediaConnection.close();
+			}
 
 			//delete facetime.els.videoOther.find("video").srcObject;
 			facetime.els.videoOther.html("<video></video>");
@@ -73,6 +75,10 @@ const Call = {
 					APP.dispatch({ type: "toggle-sidebar", value: "hide" });
 					APP.els.videoCall.addClass(`outbound-${type}-request`);
 				} else {
+					if (!APP.stream) {
+						// if camera stream has not yet finish initiate - wait & try again
+						return setTimeout(() => Self.receive(event), 200);
+					}
 					user = defiant.user.friend(event.from);
 					Self.el.data({ "username": user.username });
 					Self.els.callTitle.find(".verb").html( defiant.i18n("is calling") );

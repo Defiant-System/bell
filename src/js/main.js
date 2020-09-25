@@ -32,7 +32,7 @@ const facetime = {
 		// auto mute video elements
 		this.els.content.find("video").map(el => { el.muted = true; });
 
-
+		// temp
 		// if (ME === "bill") {
 		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
 		// }
@@ -46,7 +46,7 @@ const facetime = {
 		switch (event.type) {
 			// system events
 			case "window.open":
-				return;
+				// return;
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
