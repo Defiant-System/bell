@@ -4,6 +4,7 @@
 		<meta name="title" value="Facetime" version="1.0"/>
 		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
 		<meta name="license" value="AGPL-3.0-or-later"/>
+		<meta name="repository" value="https://github.com/Defiant-System/facetime"/>
 		<meta name="width" value="640"/>
 		<meta name="height" value="480"/>
 		<meta name="top" value="120"/>
