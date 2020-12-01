@@ -91,8 +91,8 @@ const facetime = {
 						window.render({
 							template: "calls",
 							match: "//Data/History",
-							loopPath: "/xsl:for-each",
-							loopSelect: "./*",
+							changePath: "/xsl:for-each",
+							changeSelect: "./*",
 							target: Self.els.callList
 						});
 						break;
@@ -100,8 +100,8 @@ const facetime = {
 						window.render({
 							template: "calls",
 							match: "//Data/History",
-							loopPath: "/xsl:for-each",
-							loopSelect: "./*[@duration = '0']",
+							changePath: "/xsl:for-each",
+							changeSelect: "./*[@duration = '0']",
 							target: Self.els.callList
 						});
 						break;
