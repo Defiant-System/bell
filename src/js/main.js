@@ -1,5 +1,5 @@
 
-defiant.require("modules/call.js");
+@import "modules/call.js";
 
 
 const ME = defiant.user.username;
