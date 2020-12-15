@@ -22,7 +22,7 @@ const facetime = {
 		Call.init();
 
 		window.bluePrint.selectNodes("//History/i").map(call => {
-			let timestamp = defiant.moment(+call.getAttribute("stamp"));
+			let timestamp = new defiant.Moment(+call.getAttribute("stamp"));
 			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
 		});
 
