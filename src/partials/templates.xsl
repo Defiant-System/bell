@@ -12,6 +12,7 @@
 					call-entry
 					<xsl:if test="$user/@online = '1'"> online</xsl:if>
 					<xsl:if test="@duration = '0'"> missed</xsl:if>
+					<xsl:if test="$user/@id = //Settings/User/@id"> me</xsl:if>
 				</xsl:attribute>
 				<span class="avatar">
 					<xsl:if test="$user/@avatar">
