@@ -24,11 +24,11 @@ const Call = {
 		receiveCall(mediaConnection) {
 			Call.mediaConnection = mediaConnection;
 
-			mediaConnection.answer(facetime.stream);
+			mediaConnection.answer(edison.stream);
 			mediaConnection.on("stream", this.receiveStream.bind(this));
 		},
 		receiveStream(userStream) {
-			let videoEl = facetime.els.videoOther.find("video")[0];
+			let videoEl = edison.els.videoOther.find("video")[0];
 
 			videoEl.srcObject = userStream;
 			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
@@ -38,12 +38,12 @@ const Call = {
 				Call.mediaConnection.close();
 			}
 
-			//delete facetime.els.videoOther.find("video").srcObject;
-			facetime.els.videoOther.html("<video></video>");
+			//delete edison.els.videoOther.find("video").srcObject;
+			edison.els.videoOther.html("<video></video>");
 		}
 	},
 	receive(event) {
-		let APP = facetime,
+		let APP = edison,
 			Self = Call,
 			action,
 			user,

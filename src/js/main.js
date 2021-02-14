@@ -4,7 +4,7 @@
 
 const ME = defiant.user.username;
 
-const facetime = {
+const edison = {
 	els: {},
 	init() {
 		// fast references
@@ -38,7 +38,7 @@ const facetime = {
 		// }
 	},
 	dispatch(event) {
-		let Self = facetime,
+		let Self = edison,
 			user,
 			type,
 			isOn,
@@ -196,4 +196,4 @@ const facetime = {
 	}
 };
 
-window.exports = facetime;
+window.exports = edison;

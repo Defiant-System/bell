@@ -1,8 +1,8 @@
 <MenuBar>
-	<Menu name="Facetime">
-		<Menu name="About Facetime"/>
+	<Menu name="Edison">
+		<Menu name="About Edison"/>
 		<Menu type="divider"/>
-		<Menu name="Quit Facetime" shell="win -c"/>
+		<Menu name="Quit Edison" shell="win -c"/>
 	</Menu>
 	<Menu name="Help">
 		<Menu name="Help" click="open-help"/>
