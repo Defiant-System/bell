@@ -18,6 +18,9 @@
 		<meta name="content" value="src/partials/content.htm"/>
 		<meta name="icons" value="src/svg/icons.svg"/>
 		<meta name="xsl" value="src/partials/templates.xsl"/>
+		<meta name="requires">
+			<!-- <entry id="login" description="Login is required to exchange messages with friends."/> -->
+		</meta>
 
 		@import "src/partials/menubar.xml"
 	</Head>
