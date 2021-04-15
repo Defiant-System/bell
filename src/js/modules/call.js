@@ -53,6 +53,9 @@ const Call = {
 			el;
 		//console.log(event);
 		switch (event.action) {
+			case "return-camera-call":
+			case "return-voice-call":
+				return APP.dispatch({ ...event, type: event.action });
 			case "inititate":
 				type = event.channel.split(":")[0];
 

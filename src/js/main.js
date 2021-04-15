@@ -167,9 +167,12 @@ const edison = {
 			case "start-voice-call":
 				el = event.el;
 				if (!el.data("username")) el = el.parents("[data-username]");
-
-				type = event.type.split("-")[1]
-				user = defiant.user.friend(el.data("username"));
+				event.username = el.data("username");
+				/* falls through */
+			case "return-camera-call":
+			case "return-voice-call":
+				type = event.type.split("-")[1];
+				user = defiant.user.friend(event.username || event.to);
 
 				// send call request
 				window.net.send({
