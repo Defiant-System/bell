@@ -2,7 +2,7 @@
 @import "modules/call.js";
 
 
-const ME = defiant.user.username;
+const ME = defiant.user;
 
 const edison = {
 	els: {},
@@ -33,7 +33,7 @@ const edison = {
 		this.els.content.find("video").map(el => { el.muted = true; });
 
 		// temp
-		// if (ME === "bill") {
+		// if (ME.username === "bill") {
 		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
 		// }
 	},
@@ -143,7 +143,8 @@ const edison = {
 				// send call request
 				window.net.send({
 					action: "accept",
-					from: ME,
+					from: ME.username,
+					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
 				});
 				break;
@@ -151,7 +152,8 @@ const edison = {
 				// send call request
 				window.net.send({
 					action: "decline",
-					from: ME,
+					from: ME.username,
+					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
 				});
 				break;
@@ -159,7 +161,8 @@ const edison = {
 				// send call request
 				window.net.send({
 					action: "hang-up",
-					from: ME,
+					from: ME.username,
+					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
 				});
 				break;
@@ -177,7 +180,8 @@ const edison = {
 				// send call request
 				window.net.send({
 					action: "inititate",
-					from: ME,
+					from: ME.username,
+					fromName: ME.name,
 					to: user.username,
 					channel: `${type}:${window.peer.id}`,
 					message: `<b>${user.name}</b> is calling you.`,

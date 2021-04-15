@@ -70,7 +70,7 @@ const Call = {
 				};
 
 				// adapt screen based up on call type
-				if (event.from === ME) {
+				if (event.from === ME.username) {
 					user = defiant.user.friend(event.to);
 					Self.el.data({ "username": user.username });
 					Self.els.callTitle.find(".verb").html( defiant.i18n("Calling") );
@@ -101,8 +101,8 @@ const Call = {
 				Self.el.prop({ className: "video-call" });
 				APP.dispatch({ type: "toggle-sidebar", value: "show" });
 
-				if (event.from === ME) {
-					console.log(`I, ${ME}, ${event.action} call`);
+				if (event.from === ME.username) {
+					console.log(`I, ${ME.username}, ${event.action} call`);
 
 					Self.peer.disconnect();
 				} else {
@@ -119,8 +119,8 @@ const Call = {
 				// adapt screen based up on call type
 				Self.el.prop({ className: `video-call ongoing-${Self.data.type}-call` });
 
-				if (event.from === ME) {
-					//console.log(`I, ${ME}, ${event.action} call`);
+				if (event.from === ME.username) {
+					//console.log(`I, ${ME.username}, ${event.action} call`);
 					Self.peer.connect();
 
 					user.uuid = Self.data.channel.split(":")[1];
