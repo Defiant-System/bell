@@ -16,7 +16,7 @@ const Sidebar = {
 			// system events
 			case "friend-status":
 				user = event.detail.username;
-				value = event.detail.online === "1" ? "online" : "offline";
+				value = event.detail.status === 1 ? "online" : "offline";
 				el = APP.els.callList.find(`div[data-username="${user}"]`);
 				// update user status
 				el.removeClass("online offline").addClass(value);

@@ -10,7 +10,7 @@
 				<xsl:attribute name="data-username"><xsl:value-of select="$user/@id"/></xsl:attribute>
 				<xsl:attribute name="class">
 					call-entry
-					<xsl:if test="$user/@online = '1'"> online</xsl:if>
+					<xsl:if test="$user/@status = 1"> online</xsl:if>
 					<xsl:if test="@duration = '0'"> missed</xsl:if>
 					<xsl:if test="$user/@id = //Settings/User/@id"> me</xsl:if>
 				</xsl:attribute>
@@ -58,7 +58,7 @@
 				<xsl:attribute name="data-username"><xsl:value-of select="@id"/></xsl:attribute>
 				<xsl:attribute name="class">
 					friend
-					<xsl:if test="@online = '1'"> online</xsl:if>
+					<xsl:if test="@status = 1"> online</xsl:if>
 				</xsl:attribute>
 				<i class="icon-offline"></i>
 				<div class="name">
