@@ -1,4 +1,5 @@
 
+@import "modules/sidebar.js";
 @import "modules/call.js";
 
 
@@ -19,7 +20,14 @@ const edison = {
 		};
 
 		// init auxilliary objects
+		Sidebar.init();
 		Call.init();
+
+		this.xHistory = window.bluePrint.selectSingleNode("//History");
+
+		// temp
+		let xEntry = $.nodeFromString(`<i username="bill" type="camera" inbound="0" stamp="1595306176929" duration="0" />`);
+		this.xHistory.appendChild(xEntry);
 
 		window.bluePrint.selectNodes("//History/i").map(call => {
 			let timestamp = new defiant.Moment(+call.getAttribute("stamp"));
@@ -27,7 +35,7 @@ const edison = {
 		});
 
 		// auto click "all" tab
-		window.find(".tab-row > div[data-arg='all']").trigger("click");
+		window.find(".tab-row > div[data-arg='missed']").trigger("click");
 
 		// auto mute video elements
 		this.els.content.find("video").map(el => { el.muted = true; });
@@ -39,14 +47,11 @@ const edison = {
 	},
 	dispatch(event) {
 		let Self = edison,
-			user,
-			type,
-			isOn,
 			el;
 		switch (event.type) {
 			// system events
 			case "window.open":
-				// return;
+				return;
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
@@ -73,132 +78,16 @@ const edison = {
 				break;
 			// custom events
 			case "toggle-sidebar":
-				if (event.value === "show") isOn = false;
-				isOn = isOn || Self.els.sidebarToggler.hasClass("push-in");
-				Self.els.sidebarToggler.toggleClass("push-in", isOn);
-				Self.els.sidebar.toggleClass("open", isOn);
+				Sidebar.dispatch(event);
 				break;
-			case "select-tab":
-				el = event.el;
-				if (el.hasClass("tab-active")) return;
-
-				el.parent().find(".tab-active").removeClass("tab-active");
-				el.addClass("tab-active");
-				
-				// render channels
-				switch (el.data("arg")) {
-					case "all":
-						window.render({
-							template: "calls",
-							match: "//Data/History",
-							changePath: "/xsl:for-each",
-							changeSelect: "./*",
-							target: Self.els.callList
-						});
-						break;
-					case "missed":
-						window.render({
-							template: "calls",
-							match: "//Data/History",
-							changePath: "/xsl:for-each",
-							changeSelect: "./*[@duration = '0']",
-							target: Self.els.callList
-						});
-						break;
-					case "friends":
-						window.render({
-							template: "friends",
-							match: "sys://Settings/Friends",
-							target: Self.els.callList
-						});
-						break;
-				}
-				break;
-			// call related events
-			case "toggle-camera":
-				el = event.el.find("i");
-				isOn = el.hasClass("icon-camera");
-				
-				if (isOn) {
-					el.prop({ className: "icon-camera-off" });
+			default:
+				el = event.el ? event.el.parents("[data-area]") : false;
+				// proxy event
+				if (el && el.hasClass("sidebar")) {
+					Sidebar.dispatch(event);
 				} else {
-					el.prop({ className: "icon-camera" });
+					Call.dispatch(event);
 				}
-				// camera mute status
-				Self.els.videoMe[0][ ! isOn ? "play" : "pause" ]();
-				break;
-			case "toggle-microphone":
-				el = event.el.find("i");
-				isOn = el.hasClass("icon-mic-on");
-				
-				if (isOn) {
-					el.prop({ className: "icon-mic-mute" });
-				} else {
-					el.prop({ className: "icon-mic-on" });
-				}
-				// microphone mute status
-				Self.els.videoMe[0].muted = ! isOn;
-				break;
-			case "accept-call":
-				// send call request
-				window.net.send({
-					action: "accept",
-					from: ME.username,
-					fromName: ME.name,
-					to: Self.els.videoCall.data("username"),
-				});
-				break;
-			case "decline-call":
-				// send call request
-				window.net.send({
-					action: "decline",
-					from: ME.username,
-					fromName: ME.name,
-					to: Self.els.videoCall.data("username"),
-				});
-				break;
-			case "end-call":
-				// send call request
-				window.net.send({
-					action: "hang-up",
-					from: ME.username,
-					fromName: ME.name,
-					to: Self.els.videoCall.data("username"),
-				});
-				break;
-			case "start-camera-call":
-			case "start-voice-call":
-				el = event.el;
-				if (!el.data("username")) el = el.parents("[data-username]");
-				event.username = el.data("username");
-				/* falls through */
-			case "return-camera-call":
-			case "return-voice-call":
-				type = event.type.split("-")[1];
-				user = defiant.user.friend(event.username || event.to);
-
-				// send call request
-				window.net.send({
-					action: "inititate",
-					from: ME.username,
-					fromName: ME.name,
-					to: user.username,
-					channel: `${type}:${window.peer.id}`,
-					message: `<b>${user.name}</b> is calling you.`,
-					options: [
-						{
-							id: defiant.AFFIRMATIVE,
-							name: "Accept",
-							payload: "action,channel",
-						},
-						{
-							id: defiant.NEGATIVE,
-							name: "Decline",
-							payload: "action,channel",
-						}
-					]
-				});
-				break;
 		}
 	}
 };

@@ -507,6 +507,7 @@ content {
 					&.tab-active {
 						background: #aaa;
 						color: #fff;
+						border-left-color: transparent;
 						text-shadow: 0 1px 0 #555;
 						z-index: 2;
 
@@ -566,6 +567,14 @@ content {
 			display: flex;
 			flex-direction: column;
 			padding: 2px 0;
+
+			&.list-friends {
+				.friend {
+					&.online {
+						order: -1;
+					}
+				}
+			}
 			
 			// applies to friends list and call entries
 			.actions {
@@ -612,8 +621,6 @@ content {
 				user-select: none;
 
 				&.online {
-					order: -1;
-
 					&:hover {
 						.name {
 							color: #fff;
@@ -665,7 +672,7 @@ content {
 				}
 
 				&.online {
-					order: -1;
+					// order: -1;
 
 					&:hover:not(.me) {
 						.actions {

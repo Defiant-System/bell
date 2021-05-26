@@ -5,6 +5,99 @@ const Call = {
 			callTitle: window.find("h2.call-title"),
 		}
 	},
+	dispatch(event) {
+		let APP = edison,
+			Self = Call,
+			user,
+			type,
+			el;
+		switch (event.type) {
+			case "toggle-camera":
+				el = event.el.find("i");
+				isOn = el.hasClass("icon-camera");
+				
+				if (isOn) {
+					el.prop({ className: "icon-camera-off" });
+				} else {
+					el.prop({ className: "icon-camera" });
+				}
+				// camera mute status
+				APP.els.videoMe[0][ ! isOn ? "play" : "pause" ]();
+				break;
+			case "toggle-microphone":
+				el = event.el.find("i");
+				isOn = el.hasClass("icon-mic-on");
+				
+				if (isOn) {
+					el.prop({ className: "icon-mic-mute" });
+				} else {
+					el.prop({ className: "icon-mic-on" });
+				}
+				// microphone mute status
+				APP.els.videoMe[0].muted = ! isOn;
+				break;
+			case "accept-call":
+				// send call request
+				window.net.send({
+					action: "accept",
+					from: ME.username,
+					fromName: ME.name,
+					to: APP.els.videoCall.data("username"),
+				});
+				break;
+			case "decline-call":
+				// send call request
+				window.net.send({
+					action: "decline",
+					from: ME.username,
+					fromName: ME.name,
+					to: APP.els.videoCall.data("username"),
+				});
+				break;
+			case "end-call":
+				// send call request
+				window.net.send({
+					action: "hang-up",
+					from: ME.username,
+					fromName: ME.name,
+					to: APP.els.videoCall.data("username"),
+				});
+				break;
+			case "start-camera-call":
+			case "start-voice-call":
+				el = event.el;
+				if (!el.data("username")) el = el.parents("[data-username]");
+				event.username = el.data("username");
+				/* falls through */
+			case "return-camera-call":
+			case "return-voice-call":
+				type = event.type.split("-")[1];
+				user = defiant.user.friend(event.username || event.to);
+
+				// send call request
+				window.net.send({
+					action: "inititate",
+					from: ME.username,
+					fromName: ME.name,
+					to: user.username,
+					channel: `${type}:${window.peer.id}`,
+					message: `<b>${user.name}</b> is calling you.`,
+					options: [
+						{
+							id: defiant.AFFIRMATIVE,
+							name: "Accept",
+							payload: "action,channel",
+						},
+						{
+							id: defiant.NEGATIVE,
+							name: "Decline",
+							payload: "action,channel",
+						}
+					]
+				});
+				break;
+		}
+	},
 	peer: {
 		connect() {
 			// establish connection
