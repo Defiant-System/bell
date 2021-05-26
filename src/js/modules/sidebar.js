@@ -7,10 +7,13 @@ const Sidebar = {
 	dispatch(event) {
 		let APP = edison,
 			Self = Sidebar,
+			data,
+			xNode,
 			target,
 			user,
 			value,
 			isOn,
+			str,
 			el;
 		switch (event.type) {
 			// system events
@@ -22,6 +25,16 @@ const Sidebar = {
 				el.removeClass("online offline").addClass(value);
 				break;
 			// custom events
+			case "add-history-entry":
+				str = `<i username="${event.data.username}"
+							type="${event.data.type}"
+							inbound="${event.data.inbound}"
+							stamp="${event.data.stamp}"
+							duration="${event.data.duration}" />`;
+				xNode = $.nodeFromString(str);
+				console.log(xNode);
+				APP.xHistory.appendChild(xNode);
+				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;
 				isOn = isOn || APP.els.sidebarToggler.hasClass("push-in");

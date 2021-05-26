@@ -23,16 +23,11 @@ const edison = {
 		Sidebar.init();
 		Call.init();
 
+		// reference to history XML
 		this.xHistory = window.bluePrint.selectSingleNode("//History");
 
-		// temp
-		let xEntry = $.nodeFromString(`<i username="bill" type="camera" inbound="0" stamp="1595306176929" duration="0" />`);
-		this.xHistory.appendChild(xEntry);
-
-		window.bluePrint.selectNodes("//History/i").map(call => {
-			let timestamp = new defiant.Moment(+call.getAttribute("stamp"));
-			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
-		});
+		// translate time stamps
+		this.fixTimestamp();
 
 		// auto click "all" tab
 		window.find(".tab-row > div[data-arg='missed']").trigger("click");
@@ -44,6 +39,12 @@ const edison = {
 		// if (ME.username === "bill") {
 		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
 		// }
+	},
+	fixTimestamp() {
+		this.xHistory.selectNodes("./i").map(call => {
+			let timestamp = new defiant.Moment(+call.getAttribute("stamp"));
+			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
+		});
 	},
 	dispatch(event) {
 		let Self = edison,

@@ -62,6 +62,18 @@ const Call = {
 					fromName: ME.name,
 					to: APP.els.videoCall.data("username"),
 				});
+
+				// add entry to call history
+				// Sidebar.dispatch({
+				// 	type: "add-history-entry",
+				// 	data: {
+				// 		username: "bill",
+				// 		type: "camera",
+				// 		inbound: 0,
+				// 		stamp: 1595306176929,
+				// 		duration: 0,
+				// 	}
+				// });
 				break;
 			case "start-camera-call":
 			case "start-voice-call":
