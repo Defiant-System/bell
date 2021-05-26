@@ -1,9 +1,30 @@
 
 const Call = {
 	init() {
+		// fast references
 		this.els = {
 			callTitle: window.find("h2.call-title"),
-		}
+		};
+
+		// call data to be saved to history
+
+		// sample: missed - inbound
+		// this.currentCall = {
+		// 	username: "bill",
+		// 	type: "camera",
+		// 	inbound: 0,
+		// 	stamp: 1595306176929,
+		// 	duration: 0,
+		// };
+
+		// sample: received - outbound
+		// this.currentCall = {
+		// 	username: "steve",
+		// 	type: "voice",
+		// 	inbound: 1,
+		// 	stamp: 1595306176929,
+		// 	duration: 132,
+		// };
 	},
 	dispatch(event) {
 		let APP = edison,

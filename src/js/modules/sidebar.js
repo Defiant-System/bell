@@ -32,7 +32,6 @@ const Sidebar = {
 							stamp="${event.data.stamp}"
 							duration="${event.data.duration}" />`;
 				xNode = $.nodeFromString(str);
-				console.log(xNode);
 				APP.xHistory.appendChild(xNode);
 				break;
 			case "toggle-sidebar":

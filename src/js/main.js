@@ -26,11 +26,22 @@ const edison = {
 		// reference to history XML
 		this.xHistory = window.bluePrint.selectSingleNode("//History");
 
+		// Sidebar.dispatch({
+		// 	type: "add-history-entry",
+		// 	data: {
+		// 		username: "steve",
+		// 		type: "voice",
+		// 		inbound: 1,
+		// 		stamp: 1595306176929,
+		// 		duration: 132,
+		// 	}
+		// });
+
 		// translate time stamps
 		this.fixTimestamp();
 
 		// auto click "all" tab
-		window.find(".tab-row > div[data-arg='missed']").trigger("click");
+		window.find(".tab-row > div[data-arg='all']").trigger("click");
 
 		// auto mute video elements
 		this.els.content.find("video").map(el => { el.muted = true; });
