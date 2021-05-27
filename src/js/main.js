@@ -37,7 +37,7 @@ const edison = {
 			.then(storageData => {
 				// reference to history XML
 				Self.xHistory = window.bluePrint.selectSingleNode("//History");
-				
+
 				if (storageData) {
 					// replace bluePrint data with storage data
 					Self.xHistory.parentNode.replaceChild(storageData, Self.xHistory);
@@ -109,6 +109,11 @@ const edison = {
 					});
 				break;
 			case "window.close":
+				// disconnect camera stream
+				if (Self.stream) {
+					Self.els.videoMe[0].src = "";
+					Self.stream.getTracks().map(item => item.stop());
+				}
 				// save settings
 				window.settings.setItem("settings", Self.settings);
 				// save call log
@@ -117,12 +122,6 @@ const edison = {
 			case "net.receive":
 				// forward event to Call-object
 				Call.receive(event);
-				break;
-			case "window.close":
-				if (Self.stream) {
-					Self.els.videoMe[0].src = "";
-					Self.stream.getTracks().map(item => item.stop());
-				}
 				break;
 			// custom events
 			case "clear-history-log":
