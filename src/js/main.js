@@ -13,7 +13,7 @@ const edison = {
 			content: window.find("content"),
 			sidebar: window.find(".sidebar"),
 			sidebarToggler: window.find(".sidebar-toggler"),
-			callList: window.find(".call-list"),
+			callList: window.find(".call-list .list-wrapper"),
 			videoCall: window.find(".video-call"),
 			videoMe: window.find(".me video"),
 			videoOther: window.find(".other"),
