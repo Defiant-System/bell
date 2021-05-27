@@ -2,7 +2,7 @@
 
 <xsl:template name="calls">
 	<xsl:for-each select="./*">
-		<xsl:sort order="ascending" select="@stamp"/>
+		<xsl:sort order="descending" select="@stamp" data-type="number"/>
 		<xsl:call-template name="call-entry" />
 	</xsl:for-each>
 </xsl:template>

@@ -43,13 +43,10 @@ const Sidebar = {
 							_new="1"/>`;
 				// add entry to call log
 				xNode = APP.xHistory.appendChild($.nodeFromString(str));
-
 				// translate time stamps
 				APP.fixTimestamp();
-
 				// list wrapper
 				prepend = APP.els.callList;
-
 				// add entry to DOM
 				el = window.render({
 							template: "call-entry",
@@ -59,28 +56,28 @@ const Sidebar = {
 
 				// remove attribute from log entry
 				xNode.removeAttribute("_new");
-
-				if (!meCalling && prepend.hasClass("list-missed") && event.data.duration === 0) {
-					// add entry to missed calls list
-					setTimeout(() => {
-						el.cssSequence("entry-reveal", "transitionend", el =>
-							el.removeClass("anim-entry-prepend entry-reveal"));
-					}, 60);
-					return;
-				}
-				if (prepend.hasClass("list-all")) {
-					// animate call entry
-					setTimeout(() => {
-						el.cssSequence("entry-reveal", "transitionend", el =>
-							el.removeClass("anim-entry-prepend entry-reveal"));
-					}, 60);
+				// remove from 
+				if (prepend.hasClass("list-friends")
+					|| prepend.hasClass("list-friends") && (meCalling || event.data.duration > 0)) {
+					el.remove();
 				}
 				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;
 				isOn = isOn || APP.els.sidebarToggler.hasClass("push-in");
 				APP.els.sidebarToggler.toggleClass("push-in", isOn);
-				APP.els.sidebar.toggleClass("open", isOn);
+
+				if (isOn) {
+					APP.els.sidebar.removeClass("open");
+				} else {
+					APP.els.sidebar.cssSequence("open", "transitionend", sidebarEl => {
+						el = APP.els.callList.find(".anim-entry-prepend");
+						if (event.value !== "show" || !el.length) return;
+						// animate call entry
+						el.cssSequence("entry-reveal", "transitionend", el =>
+							el.removeClass("anim-entry-prepend entry-reveal"));
+					});
+				}
 				break;
 			case "select-tab":
 				el = event.el;

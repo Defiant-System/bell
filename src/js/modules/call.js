@@ -84,18 +84,6 @@ const Call = {
 					fromName: ME.name,
 					to: APP.els.videoCall.data("username"),
 				});
-
-				// add entry to call history
-				// Sidebar.dispatch({
-				// 	type: "history-log-call",
-				// 	data: {
-				// 		username: "bill",
-				// 		type: "camera",
-				// 		inbound: 0,
-				// 		stamp: 1595306176929,
-				// 		duration: 0,
-				// 	}
-				// });
 				break;
 			case "start-camera-call":
 			case "start-voice-call":
@@ -195,7 +183,6 @@ const Call = {
 					user1: event.from,
 					user2: event.to,
 					channel: event.channel,
-					stamp: Date.now(),
 				};
 
 				// adapt screen based up on call type
@@ -241,14 +228,22 @@ const Call = {
 					Self.peer.disconnect();
 				}
 				// add entry to call log
-				data = {
-					...Self.data,
-					duration: Math.round((Date.now() - Self.data.stamp) / 1000),
-				};
+				data = { ...Self.data };
+				if (data.stamp) {
+					// call answered - add duration
+					data.duration = Math.round((Date.now() - Self.data.stamp) / 1000);
+				} else {
+					// call was not answered - add time stamp and "0" as duration
+					data.stamp = Date.now();
+					data.duration = 0;
+				}
 				Sidebar.dispatch({ type: "history-log-call", data });
 				break;
 			case "accept":
 				user = defiant.user.friend(Self.el.data("username"));
+
+				// call answered - add time stamp
+				Self.data.stamp = Date.now();
 
 				// adapt screen based up on call type
 				Self.el.prop({ className: `video-call ongoing-${Self.data.type}-call` });

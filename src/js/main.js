@@ -26,6 +26,12 @@ const edison = {
 		// reference to history XML
 		this.xHistory = window.bluePrint.selectSingleNode("//History");
 
+		if (ME.username === "bill") {
+			while (this.xHistory.hasChildNodes()) {
+				this.xHistory.removeChild(this.xHistory.firstChild);
+			}
+		}
+
 		// translate time stamps
 		this.fixTimestamp();
 
@@ -35,19 +41,26 @@ const edison = {
 		// auto mute video elements
 		// this.els.content.find("video").map(el => { el.muted = true; });
 
-		// temp
-		// setTimeout(() => {
-		// 	Sidebar.dispatch({
-		// 		type: "history-log-call",
-		// 		data: {
-		// 			user1: "hbi",
-		// 			user2: "bill",
-		// 			type: "voice",
-		// 			stamp: 1595306176929,
-		// 			duration: 0,
-		// 		}
-		// 	});
-		// }, 1000);
+		/* temp
+		this.dispatch({ type: "toggle-sidebar", value: "hide" });
+
+		setTimeout(() => {
+			Sidebar.dispatch({
+				type: "history-log-call",
+				data: {
+					user1: "hbi",
+					user2: "bill",
+					type: "voice",
+					stamp: 1595306176929,
+					duration: 0,
+				}
+			});
+			
+			setTimeout(() => {
+				edison.dispatch({ type: "toggle-sidebar", value: "show" });
+			}, 100);
+		}, 1500);
+		*/
 
 		// if (ME.username === "bill") {
 		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
@@ -65,7 +78,6 @@ const edison = {
 		switch (event.type) {
 			// system events
 			case "window.open":
-				// return;
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
