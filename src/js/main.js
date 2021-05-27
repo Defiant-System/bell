@@ -26,17 +26,6 @@ const edison = {
 		// reference to history XML
 		this.xHistory = window.bluePrint.selectSingleNode("//History");
 
-		// Sidebar.dispatch({
-		// 	type: "add-history-entry",
-		// 	data: {
-		// 		username: "steve",
-		// 		type: "voice",
-		// 		inbound: 1,
-		// 		stamp: 1595306176929,
-		// 		duration: 132,
-		// 	}
-		// });
-
 		// translate time stamps
 		this.fixTimestamp();
 
@@ -47,6 +36,19 @@ const edison = {
 		this.els.content.find("video").map(el => { el.muted = true; });
 
 		// temp
+		setTimeout(() => {
+			Sidebar.dispatch({
+				type: "history-log-call",
+				data: {
+					user1: "hbi",
+					user2: "bill",
+					type: "voice",
+					stamp: 1595306176929,
+					duration: 132,
+				}
+			});
+		}, 1000);
+
 		// if (ME.username === "bill") {
 		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
 		// }
@@ -72,7 +74,7 @@ const edison = {
 						Self.stream = stream;
 
 						video.srcObject = stream;
-						// video.muted = true;
+						video.muted = defiant.env === "dev";
 						video.addEventListener("loadedmetadata", () => {
 							video.play();
 						});

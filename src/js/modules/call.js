@@ -31,6 +31,7 @@ const Call = {
 			Self = Call,
 			user,
 			type,
+			isOn,
 			el;
 		switch (event.type) {
 			case "toggle-camera":
@@ -86,7 +87,7 @@ const Call = {
 
 				// add entry to call history
 				// Sidebar.dispatch({
-				// 	type: "add-history-entry",
+				// 	type: "history-log-call",
 				// 	data: {
 				// 		username: "bill",
 				// 		type: "camera",
@@ -172,6 +173,7 @@ const Call = {
 		let APP = edison,
 			Self = Call,
 			action,
+			data,
 			user,
 			type,
 			from,
@@ -193,6 +195,7 @@ const Call = {
 					user1: event.from,
 					user2: event.to,
 					channel: event.channel,
+					stamp: Date.now(),
 				};
 
 				// adapt screen based up on call type
@@ -237,7 +240,12 @@ const Call = {
 
 					Self.peer.disconnect();
 				}
-				// TODO: add entry to call log
+				// add entry to call log
+				data = {
+					...Self.data,
+					duration: Math.round((Date.now() - Self.data.stamp) / 1000),
+				};
+				Sidebar.dispatch({ type: "history-log-call", data });
 				break;
 			case "accept":
 				user = defiant.user.friend(Self.el.data("username"));
