@@ -40,8 +40,9 @@
 		<xsl:attribute name="class">
 			call-entry
 			<xsl:if test="$user/@status = 1"> online</xsl:if>
-			<xsl:if test="@duration = '0'"> missed</xsl:if>
+			<xsl:if test="@inbound = 1 and @duration = 0"> missed</xsl:if>
 			<xsl:if test="$user/@id = //Settings/User/@id"> me</xsl:if>
+			<xsl:if test="@_new"> anim-entry-prepend</xsl:if>
 		</xsl:attribute>
 		<span class="avatar">
 			<xsl:if test="$user/@avatar">
@@ -60,7 +61,7 @@
 					</xsl:if>
 				</i>
 				<i class="icon-out">
-					<xsl:if test="@inbound = '0'">
+					<xsl:if test="@inbound = 1">
 						<xsl:attribute name="class">icon-in</xsl:attribute>
 					</xsl:if>
 				</i>

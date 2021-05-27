@@ -10,8 +10,8 @@ const Sidebar = {
 			data,
 			xNode,
 			target,
+			prepend,
 			user,
-			inbound,
 			value,
 			isOn,
 			str,
@@ -32,39 +32,48 @@ const Sidebar = {
 				Call.dispatch(event);
 				break;
 			case "history-log-call":
-				user = ME.username === event.data.user1 ? event.data.user2 : event.data.user1;
-				inbound = ME.username === event.data.user2 ? 1 : 0;
-				str = `<i username="${user}"
+				let meCalling = ME.username === event.data.user1,
+					username = meCalling ? event.data.user2 : event.data.user1,
+					inbound = ME.username === event.data.user2 ? 1 : 0;
+				str = `<i username="${username}"
 							inbound="${inbound}"
 							type="${event.data.type}"
 							stamp="${event.data.stamp}"
-							duration="${event.data.duration}" />`;
+							duration="${event.data.duration}"
+							_new="1"/>`;
 				// add entry to call log
 				xNode = APP.xHistory.appendChild($.nodeFromString(str));
 
 				// translate time stamps
 				APP.fixTimestamp();
 
+				// list wrapper
+				prepend = APP.els.callList;
+
 				// add entry to DOM
 				el = window.render({
 							template: "call-entry",
 							match: `//Data/History/*[last()]`,
-							vdom: true,
-						})
-						.find(".call-entry")
-						.addClass("anim-entry-prepend");
+							prepend,
+						});
 
-				pEl = APP.els.callList;
-				if (pEl.hasClass("list-all")) {
-					el = pEl.prepend(el);
+				// remove attribute from log entry
+				xNode.removeAttribute("_new");
+
+				if (!meCalling && prepend.hasClass("list-missed") && event.data.duration === 0) {
+					// add entry to missed calls list
+					setTimeout(() => {
+						el.cssSequence("entry-reveal", "transitionend", el =>
+							el.removeClass("anim-entry-prepend entry-reveal"));
+					}, 60);
+					return;
+				}
+				if (prepend.hasClass("list-all")) {
 					// animate call entry
 					setTimeout(() => {
 						el.cssSequence("entry-reveal", "transitionend", el =>
 							el.removeClass("anim-entry-prepend entry-reveal"));
-					}, 100);
-				}
-				if (pEl.hasClass("list-missed")) {
-					// add entry to missed calls list
+					}, 60);
 				}
 				break;
 			case "toggle-sidebar":
@@ -100,7 +109,7 @@ const Sidebar = {
 							template: "calls",
 							match: "//Data/History",
 							changePath: "/xsl:for-each",
-							changeSelect: "./*[@duration = '0']",
+							changeSelect: "./*[@inbound = 1][@duration = 0]",
 							target
 						});
 						break;
