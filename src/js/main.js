@@ -3,6 +3,11 @@
 @import "modules/call.js";
 
 
+const defaultSettings = {
+	"clear-history-log": 604800,
+};
+
+
 const ME = defiant.user;
 
 const edison = {
@@ -23,23 +28,36 @@ const edison = {
 		Sidebar.init();
 		Call.init();
 
-		// reference to history XML
-		this.xHistory = window.bluePrint.selectSingleNode("//History");
-
-		if (ME.username === "bill") {
-			while (this.xHistory.hasChildNodes()) {
-				this.xHistory.removeChild(this.xHistory.firstChild);
-			}
-		}
-
-		// translate time stamps
-		this.fixTimestamp();
-
-		// auto click "all" tab
-		window.find(".tab-row > div[data-arg='all']").trigger("click");
-
 		// auto mute video elements
 		// this.els.content.find("video").map(el => { el.muted = true; });
+
+		let Self = this;
+		// check storage for previously saved data
+		window.storage.getItem("call-history")
+			.then(storageData => {
+				// reference to history XML
+				Self.xHistory = window.bluePrint.selectSingleNode("//History");
+				
+				if (storageData) {
+					// replace bluePrint data with storage data
+					Self.xHistory.parentNode.replaceChild(storageData, Self.xHistory);
+					Self.xHistory = window.bluePrint.selectSingleNode(`//History`);
+				}
+				// get settings, if any
+				Self.settings = window.settings.getItem("settings") || defaultSettings;
+				// auto clear call log
+				let arg = Self.settings["clear-history-log"];
+				Sidebar.dispatch({ type: "clear-history-log", arg });
+				// translate time stamps
+				Self.fixTimestamp();
+				// auto click "all" tab
+				window.find(".tab-row > div[data-arg='all']").trigger("click");
+				// fix menu options
+				window.bluePrint.selectNodes(`//Menu[@check-group="clear-log"]`).map(xMenu =>
+					(+xMenu.getAttribute("arg") === +arg)
+						? xMenu.setAttribute("is-checked", 1)
+						: xMenu.removeAttribute("is-checked"));
+			});
 
 		/* temp
 		this.dispatch({ type: "toggle-sidebar", value: "hide" });
@@ -61,10 +79,6 @@ const edison = {
 			}, 100);
 		}, 1500);
 		*/
-
-		// if (ME.username === "bill") {
-		// 	window.find(".call-list .call-entry[data-username='hbi'] [data-click='start-camera-call']").trigger("click");
-		// }
 	},
 	fixTimestamp() {
 		this.xHistory.selectNodes("./i").map(call => {
@@ -78,6 +92,8 @@ const edison = {
 		switch (event.type) {
 			// system events
 			case "window.open":
+				// return;
+				// initiate camera
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
@@ -92,6 +108,12 @@ const edison = {
 						});
 					});
 				break;
+			case "window.close":
+				// save settings
+				window.settings.setItem("settings", Self.settings);
+				// save call log
+				window.storage.setItem("call-history", Self.xHistory);
+				break;
 			case "net.receive":
 				// forward event to Call-object
 				Call.receive(event);
@@ -103,6 +125,7 @@ const edison = {
 				}
 				break;
 			// custom events
+			case "clear-history-log":
 			case "toggle-sidebar":
 				Sidebar.dispatch(event);
 				break;

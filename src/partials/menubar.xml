@@ -1,6 +1,20 @@
 <MenuBar>
 	<Menu name="Edison">
-		<Menu name="About Edison"/>
+		<Menu name="About Edison" shell="win -a"/>
+		<Menu type="divider"/>
+		<Menu name="Call History">
+			<Menu name="Clear Older than&#8230;">
+				<Menu type="caption" name="Automatically"/>
+				<Menu name="24h" click="clear-history-log" arg="86400" check-group="clear-log"/>
+				<Menu name="1 Week" click="clear-history-log" arg="604800" check-group="clear-log" is-checked="1"/>
+				<Menu name="1 Month" click="clear-history-log" arg="2678400" check-group="clear-log"/>
+				<Menu type="divider"/>
+				<Menu name="Keep All" click="clear-history-log" arg="-1" check-group="clear-log"/>
+			</Menu>
+			<Menu type="divider"/>
+			<Menu name="Clear Missed Calls" click="clear-history-log" arg="-2"/>
+			<Menu name="Clear All" click="clear-history-log" arg="0"/>
+		</Menu>
 		<Menu type="divider"/>
 		<Menu name="Quit Edison" shell="win -c"/>
 	</Menu>

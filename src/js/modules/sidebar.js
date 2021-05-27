@@ -8,6 +8,7 @@ const Sidebar = {
 		let APP = edison,
 			Self = Sidebar,
 			data,
+			xPath,
 			xNode,
 			target,
 			prepend,
@@ -27,6 +28,38 @@ const Sidebar = {
 				el.removeClass("online offline").addClass(value);
 				break;
 			// custom events
+			case "clear-history-log":
+				value = +event.arg;
+
+				switch (value) {
+					case 0: // all
+						xPath = `./*`;
+						break;
+					case -1: // keep all
+						xPath = `./*[@duration = ${value}]`;
+						// save to settings
+						APP.settings["clear-history-log"] = event.arg;
+						break;
+					case -2: // clear missed only
+						xPath = `./*[@inbound = 1][@duration = 0]`;
+						break;
+					default:
+						// clear older than "seconds"
+						value = Date.now() - (value * 1000);
+						xPath = `./*[position() > 20][@stamp < "${value}"]`;
+						// save to settings
+						APP.settings["clear-history-log"] = event.arg;
+				}
+				// clear entries from DOM & xHistory
+				APP.xHistory.selectNodes(xPath).map(xEntry => {
+					let stamp = xEntry.getAttribute("stamp"),
+						el = APP.els.sidebar.find(`.call-entry[data-stamp="${stamp}"]`);
+					// remove from DOM
+					el.remove();
+					// remove from xHistory
+					xEntry.parentNode.removeChild(xEntry);
+				});
+				break;
 			case "start-camera-call":
 			case "start-voice-call":
 				Call.dispatch(event);
@@ -42,23 +75,24 @@ const Sidebar = {
 							duration="${event.data.duration}"
 							_new="1"/>`;
 				// add entry to call log
-				xNode = APP.xHistory.appendChild($.nodeFromString(str));
+				xNode = APP.xHistory.insertBefore($.nodeFromString(str), APP.xHistory.firstChild);
+
 				// translate time stamps
 				APP.fixTimestamp();
 				// list wrapper
 				prepend = APP.els.callList;
+				// skip adding if friends tab is active
+				if (prepend.hasClass("list-friends")) return;
 				// add entry to DOM
 				el = window.render({
 							template: "call-entry",
-							match: `//Data/History/*[last()]`,
+							match: `//Data/History/*[1]`,
 							prepend,
 						});
-
 				// remove attribute from log entry
 				xNode.removeAttribute("_new");
 				// remove from 
-				if (prepend.hasClass("list-friends")
-					|| prepend.hasClass("list-friends") && (meCalling || event.data.duration > 0)) {
+				if (prepend.hasClass("list-friends") && (meCalling || event.data.duration > 0)) {
 					el.remove();
 				}
 				break;
@@ -70,7 +104,7 @@ const Sidebar = {
 				if (isOn) {
 					APP.els.sidebar.removeClass("open");
 				} else {
-					APP.els.sidebar.cssSequence("open", "transitionend", sidebarEl => {
+					APP.els.sidebar.cssSequence("open", "transitionend", sEl => {
 						el = APP.els.callList.find(".anim-entry-prepend");
 						if (event.value !== "show" || !el.length) return;
 						// animate call entry
