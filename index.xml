@@ -1,7 +1,7 @@
 <Application>
 	<Head>
 		<meta name="id" value="edison"/>
-		<meta name="title" value="Edison" version="1.0"/>
+		<meta name="title" value="Edison" version="1.1"/>
 		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
 		<meta name="license" value="AGPL-3.0-or-later"/>
 		<meta name="repository" value="https://github.com/Defiant-System/edison"/>
