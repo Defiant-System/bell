@@ -570,19 +570,19 @@ content {
 			height: 100%;
 			padding: 2px 0;
 
-			&.list-friends {
-				.friend {
-					&.online {
-						order: -1;
-					}
-				}
-			}
-
 			.list-wrapper {
 				height: 100%;
 				overflow: auto;
 				display: flex;
 				flex-direction: column;
+
+				&.list-friends {
+					.friend {
+						&.online {
+							order: -1;
+						}
+					}
+				}
 			}
 			
 			// applies to friends list and call entries

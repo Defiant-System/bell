@@ -9,6 +9,7 @@
 
 <xsl:template name="friends">
 	<xsl:for-each select="./*">
+		<xsl:sort order="ascending" select="@name"/>
 		<xsl:if test="not(@me)">
 			<div>
 				<xsl:attribute name="data-username"><xsl:value-of select="@id"/></xsl:attribute>
