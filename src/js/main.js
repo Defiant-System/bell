@@ -44,7 +44,7 @@ const edison = {
 					Self.xHistory = window.bluePrint.selectSingleNode(`//History`);
 				}
 				// get settings, if any
-				Self.settings = window.settings.getItem("settings") || defaultSettings;
+				Self.settings = window.settings.getItem("settings") || defaultSettings;
 				// auto clear call log
 				let arg = Self.settings["clear-history-log"];
 				Sidebar.dispatch({ type: "clear-history-log", arg });

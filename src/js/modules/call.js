@@ -94,7 +94,7 @@ const Call = {
 			case "return-camera-call":
 			case "return-voice-call":
 				type = event.type.split("-")[1];
-				user = defiant.user.friend(event.username || event.to);
+				user = defiant.user.friend(event.username || event.to);
 
 				// send call request
 				window.net.send({
