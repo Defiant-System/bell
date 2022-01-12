@@ -5,7 +5,7 @@ const Sidebar = {
 		defiant.on("sys:friend-status", this.dispatch);
 	},
 	dispatch(event) {
-		let APP = edison,
+		let APP = bell,
 			Self = Sidebar,
 			data,
 			xPath,

@@ -10,7 +10,7 @@ const defaultSettings = {
 
 const ME = defiant.user;
 
-const edison = {
+const bell = {
 	els: {},
 	init() {
 		// fast references
@@ -75,7 +75,7 @@ const edison = {
 			});
 			
 			setTimeout(() => {
-				edison.dispatch({ type: "toggle-sidebar", value: "show" });
+				bell.dispatch({ type: "toggle-sidebar", value: "show" });
 			}, 100);
 		}, 1500);
 		*/
@@ -87,7 +87,7 @@ const edison = {
 		});
 	},
 	dispatch(event) {
-		let Self = edison,
+		let Self = bell,
 			el;
 		switch (event.type) {
 			// system events
@@ -140,4 +140,4 @@ const edison = {
 	}
 };
 
-window.exports = edison;
+window.exports = bell;

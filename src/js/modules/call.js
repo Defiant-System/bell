@@ -27,7 +27,7 @@ const Call = {
 		// };
 	},
 	dispatch(event) {
-		let APP = edison,
+		let APP = bell,
 			Self = Call,
 			user,
 			type,
@@ -139,11 +139,11 @@ const Call = {
 		receiveCall(mediaConnection) {
 			Call.mediaConnection = mediaConnection;
 
-			mediaConnection.answer(edison.stream);
+			mediaConnection.answer(bell.stream);
 			mediaConnection.on("stream", this.receiveStream.bind(this));
 		},
 		receiveStream(userStream) {
-			let videoEl = edison.els.videoOther.find("video")[0];
+			let videoEl = bell.els.videoOther.find("video")[0];
 
 			videoEl.srcObject = userStream;
 			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
@@ -153,12 +153,12 @@ const Call = {
 				Call.mediaConnection.close();
 			}
 
-			//delete edison.els.videoOther.find("video").srcObject;
-			edison.els.videoOther.html("<video></video>");
+			//delete bell.els.videoOther.find("video").srcObject;
+			bell.els.videoOther.html("<video></video>");
 		}
 	},
 	receive(event) {
-		let APP = edison,
+		let APP = bell,
 			Self = Call,
 			action,
 			data,

@@ -1,6 +1,6 @@
 <MenuBar>
-	<Menu name="Edison">
-		<Menu name="About Edison" shell="win -a"/>
+	<Menu name="Bell">
+		<Menu name="About Bell" shell="win -a"/>
 		<Menu type="divider"/>
 		<Menu name="Call History">
 			<Menu name="Clear Older than&#8230;">
@@ -16,7 +16,7 @@
 			<Menu name="Clear All" click="clear-history-log" arg="0"/>
 		</Menu>
 		<Menu type="divider"/>
-		<Menu name="Quit Edison" shell="win -c"/>
+		<Menu name="Quit Bell" shell="win -c"/>
 	</Menu>
 	<Menu name="Help">
 		<Menu name="Help" click="open-help"/>

@@ -1,10 +1,10 @@
 <Application>
 	<Head>
-		<meta name="id" value="edison"/>
-		<meta name="title" value="Edison" version="1.1"/>
+		<meta name="id" value="bell"/>
+		<meta name="title" value="Bell" version="1.1"/>
 		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
 		<meta name="license" value="AGPL-3.0-or-later"/>
-		<meta name="repository" value="https://github.com/Defiant-System/edison"/>
+		<meta name="repository" value="https://github.com/Defiant-System/bell"/>
 		<meta name="width" value="640"/>
 		<meta name="height" value="480"/>
 		<meta name="top" value="120"/>
