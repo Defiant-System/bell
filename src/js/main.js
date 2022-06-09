@@ -91,7 +91,7 @@ const bell = {
 			el;
 		switch (event.type) {
 			// system events
-			case "window.open":
+			case "window.init":
 				// return;
 				// initiate camera
 				navigator.mediaDevices
