@@ -2,7 +2,7 @@
 const Sidebar = {
 	init() {
 		// listen to system event
-		defiant.on("sys:friend-status", this.dispatch);
+		karaqu.on("sys:friend-status", this.dispatch);
 	},
 	dispatch(event) {
 		let APP = bell,

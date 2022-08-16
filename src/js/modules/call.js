@@ -94,7 +94,7 @@ const Call = {
 			case "return-camera-call":
 			case "return-voice-call":
 				type = event.type.split("-")[1];
-				user = defiant.user.friend(event.username || event.to);
+				user = karaqu.user.friend(event.username || event.to);
 
 				// send call request
 				window.net.send({
@@ -106,12 +106,12 @@ const Call = {
 					message: `<b>${user.name}</b> is calling you.`,
 					options: [
 						{
-							id: defiant.AFFIRMATIVE,
+							id: karaqu.AFFIRMATIVE,
 							name: "Accept",
 							payload: "action,channel",
 						},
 						{
-							id: defiant.NEGATIVE,
+							id: karaqu.NEGATIVE,
 							name: "Decline",
 							payload: "action,channel",
 						}
@@ -187,9 +187,9 @@ const Call = {
 
 				// adapt screen based up on call type
 				if (event.from === ME.username) {
-					user = defiant.user.friend(event.to);
+					user = karaqu.user.friend(event.to);
 					Self.el.data({ "username": user.username });
-					Self.els.callTitle.find(".verb").html( defiant.i18n("Calling") );
+					Self.els.callTitle.find(".verb").html( karaqu.i18n("Calling") );
 					Self.els.callTitle.find(".user").html( user.name );
 					APP.dispatch({ type: "toggle-sidebar", value: "hide" });
 					APP.els.videoCall.addClass(`outbound-${type}-request`);
@@ -198,15 +198,15 @@ const Call = {
 						// if camera stream has not yet finish initiate - wait & try again
 						return setTimeout(() => Self.receive(event), 200);
 					}
-					user = defiant.user.friend(event.from);
+					user = karaqu.user.friend(event.from);
 					Self.el.data({ "username": user.username });
-					Self.els.callTitle.find(".verb").html( defiant.i18n("is calling") );
+					Self.els.callTitle.find(".verb").html( karaqu.i18n("is calling") );
 					Self.els.callTitle.find(".user").html( user.name );
 					APP.dispatch({ type: "toggle-sidebar", value: "hide" });
 					APP.els.videoCall.addClass(`inbound-${type}-request`);
 
 					if (event.response !== undefined) {
-						action = (event.response === defiant.AFFIRMATIVE) ? "accept" : "decline";
+						action = (event.response === karaqu.AFFIRMATIVE) ? "accept" : "decline";
 						APP.dispatch({ ...event, action, type: action +"-call" });
 					}
 				}
@@ -222,7 +222,7 @@ const Call = {
 
 					Self.peer.disconnect();
 				} else {
-					user = defiant.user.friend(Self.el.data("username"));
+					user = karaqu.user.friend(Self.el.data("username"));
 					console.log(`${user.name}, ${event.action} call`);
 
 					Self.peer.disconnect();
@@ -240,7 +240,7 @@ const Call = {
 				Sidebar.dispatch({ type: "history-log-call", data });
 				break;
 			case "accept":
-				user = defiant.user.friend(Self.el.data("username"));
+				user = karaqu.user.friend(Self.el.data("username"));
 
 				// call answered - add time stamp
 				Self.data.stamp = Date.now();

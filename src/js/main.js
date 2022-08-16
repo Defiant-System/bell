@@ -8,7 +8,7 @@ const defaultSettings = {
 };
 
 
-const ME = defiant.user;
+const ME = karaqu.user;
 
 const bell = {
 	els: {},
@@ -82,7 +82,7 @@ const bell = {
 	},
 	fixTimestamp() {
 		this.xHistory.selectNodes("./i").map(call => {
-			let timestamp = new defiant.Moment(+call.getAttribute("stamp"));
+			let timestamp = new karaqu.Moment(+call.getAttribute("stamp"));
 			call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
 		});
 	},
@@ -102,7 +102,7 @@ const bell = {
 						Self.stream = stream;
 
 						video.srcObject = stream;
-						video.muted = defiant.env === "dev";
+						video.muted = karaqu.env === "dev";
 						video.addEventListener("loadedmetadata", () => {
 							video.play();
 						});
