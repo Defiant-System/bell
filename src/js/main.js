@@ -4,7 +4,7 @@
 
 
 const defaultSettings = {
-	"clear-history-log": 604800,
+	"clear-history-log": 604800,  // Seven days: 7*24*60*60
 };
 
 
@@ -79,6 +79,8 @@ const bell = {
 			}, 100);
 		}, 1500);
 		*/
+
+		// setTimeout(() => window.find(`div[data-arg="friends"]`).trigger("click"), 800);
 	},
 	fixTimestamp() {
 		this.xHistory.selectNodes("./i").map(call => {
