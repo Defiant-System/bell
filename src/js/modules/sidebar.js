@@ -13,8 +13,6 @@
 			videoMe: window.find(".me video"),
 			videoOther: window.find(".other"),
 		};
-		// apply user settings
-		this.dispatch({ type: "apply-settings" });
 		// listen to system event
 		karaqu.on("sys:friend-status", this.dispatch);
 	},

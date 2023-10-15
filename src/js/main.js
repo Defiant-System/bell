@@ -57,6 +57,7 @@ const bell = {
 		}
 	},
 	sidebar: @import "./modules/sidebar.js",
+	history: @import "./modules/history.js",
 	call: @import "./modules/call.js",
 };
 

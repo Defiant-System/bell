@@ -2,7 +2,10 @@
 let Test = {
 	init(APP) {
 		
-		// setTimeout(() => APP.library.dispatch({ type: "minify-all-files" }), 500);
+		setTimeout(() => APP.sidebar.dispatch({
+			type: "friend-status",
+			detail: { username: "bill", status: 1 }
+		}), 1e3);
 
 	}
 };
