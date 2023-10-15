@@ -3,7 +3,10 @@
 
 {
 	init() {
-		
+		// fast references
+		this.els = {
+			callTitle: window.find("h2.call-title"),
+		};
 	},
 	dispatch(event) {
 		let APP = bell,
