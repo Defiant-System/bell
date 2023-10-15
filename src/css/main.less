@@ -210,6 +210,253 @@ content {
 				}
 			}
 		}
+
+		.call-list {
+			overflow: hidden;
+			height: 100%;
+
+			.list-wrapper {
+				height: 100%;
+				overflow: auto;
+				display: flex;
+				flex-direction: column;
+				padding: 0 5px 7px;
+
+				&.list-friends {
+					.friend {
+						&.online {
+							order: -1;
+						}
+					}
+				}
+			}
+			
+			// applies to friends list and call entries
+			.actions {
+				width: 0;
+				overflow-y: hidden;
+				margin-left: 5px;
+				padding-top: 3px;
+				text-align: right;
+				white-space: nowrap;
+				transition: width 120ms ease-in-out;
+
+				> div {
+					background: rgba(255,255,255,.15);
+					display: inline-block;
+					width: 21px;
+					height: 21px;
+					text-align: center;
+					padding-top: 3px;
+					margin-left: 2px;
+					border-radius: 50%;
+					cursor: pointer;
+					
+					&:hover {
+						background: #44aa44;
+
+						i[class^="icon-"] {
+							filter: invert();
+						}
+					}
+
+					i[class^="icon-"] {
+						width: 13px;
+						height: 13px;
+						filter: invert() opacity(.25);
+						cursor: pointer;
+					}
+				}
+			}
+
+			.friend {
+				display: flex;
+				padding: 0 9px;
+				margin-bottom: 7px;
+				user-select: none;
+
+				&.online {
+					&:hover {
+						.name {
+							color: #fff;
+						}
+
+						.actions {
+							width: 49px;
+						}
+					}
+
+					.icon-offline {
+						background-image: url(~/icons/icon-online.png);
+						opacity: 1;
+					}
+
+					.name {
+						opacity: 1;
+					}
+
+					.actions {
+						display: block;
+					}
+				}
+
+				.icon-offline {
+					width: 13px;
+					height: 13px;
+					margin: 4px 5px 0 0;
+					opacity: .5;
+				}
+
+				.name {
+					flex: 1;
+					padding: 4px 0 0 0;
+					opacity: .5;
+				}
+			}
+
+			.call-entry {
+				// background: rgba(#fff,.1);
+				display: flex;
+				padding: 3px 7px 4px;
+				border-radius: 4px;
+				margin-bottom: 3px;
+				user-select: none;
+
+				&:hover {
+					background: rgba(#fff,.1);
+
+					.name {
+						color: #fff;
+					}
+				}
+
+				&.anim-entry-prepend {
+					margin-top: -39px;
+					transition: margin 200ms ease-in-out;
+					
+					&.entry-reveal {
+						margin-top: 0;
+						margin-bottom: 9px;
+					}
+				}
+
+				&.online {
+					// order: -1;
+
+					&:hover:not(.me) {
+						.actions {
+							width: 49px;
+						}
+					}
+
+					.avatar {
+						opacity: 1;
+					}
+
+					.details {
+						.name {
+							opacity: 1;
+							
+							.icon-online {
+								background-image: url(~/icons/icon-online.png);
+								opacity: 1;
+							}
+						}
+
+						.last-call {
+							opacity: .4;
+						}
+					}
+				}
+
+				&.missed {
+					.details {
+						.name {
+							color: #f55;
+							opacity: 1;
+							text-shadow: 0 1px 0 #222;
+						}
+					}
+
+				}
+
+				.avatar {
+					background: url(~/icons/icon-user.png) 50% 50%/contain no-repeat;
+					display: inline-block;
+					width: 23px;
+					height: 23px;
+					border-radius: 50%;
+					margin-right: 7px;
+					margin-top: 4px;
+					border-radius: 50%;
+					opacity: .6;
+				//	box-shadow: inset 0 0 0 1px rgba(0,0,0,.8);
+					
+					&:not([style]) {
+						filter: invert();
+						opacity: .35;
+					}
+				}
+
+				.details {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					overflow: hidden;
+
+					.name {
+						font-weight: 500;
+						padding-bottom: 2px;
+						font-size: 14px;
+						display: block;
+						overflow: hidden;
+						white-space: nowrap;
+						text-overflow: ellipsis;
+						text-shadow: 0 1px 0 rgba(#000,.2);
+						opacity: .5;
+
+						i[class^="icon-"] {
+							position: relative;
+							top: 3px;
+							width: 11px;
+							height: 11px;
+							display: inline-block;
+							vertical-align: text-top;
+							margin-right: 4px;
+							background-image: url(~/icons/icon-offline.png);
+							opacity: .5;
+						}
+					}
+
+					.last-call {
+						opacity: .25;
+						display: block;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						font-size: 12px;
+
+						i[class^="icon-"] {
+							position: relative;
+							top: 1px;
+							left: 1px;
+							display: inline-block;
+							vertical-align: text-top;
+							width: 13px;
+							height: 13px;
+							filter: invert() opacity(.5);
+
+							&:nth-child(2) {
+								top: 2px;
+								margin: 0 4px 0 1px;
+								width: 10px;
+								height: 10px;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	.video-call {

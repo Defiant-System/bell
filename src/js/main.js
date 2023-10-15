@@ -14,7 +14,8 @@ let Pref = {
 const bell = {
 	init() {
 		// get settings, if any
-		this.settings = window.settings.getItem("settings") || { ...Pref };
+		// this.settings = window.settings.getItem("settings") || { ...Pref };
+		this.settings = { ...Pref };
 
 		// init all sub-objects
 		Object.keys(this)

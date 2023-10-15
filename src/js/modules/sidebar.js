@@ -7,7 +7,7 @@
 		this.els = {
 			content: window.find("content"),
 			sidebar: window.find(".sidebar"),
-			sidebarToggler: window.find(".sidebar-toggler"),
+			sidebarToggler: window.find(".sidebar-toggler > i"),
 			callList: window.find(".call-list .list-wrapper"),
 			videoCall: window.find(".video-call"),
 			videoMe: window.find(".me video"),
@@ -44,7 +44,11 @@
 				break;
 			// custom events
 			case "apply-settings":
-				Self.els.sidebar.toggleClass("open", !APP.settings.sidebar.expanded);
+				if (APP.settings.sidebar.expanded) {
+					Self.els.sidebarToggler.trigger("click");
+				}
+				value = APP.settings.sidebar["active-tab"];
+				Self.els.sidebar.find(`.tab-row > div:nth(${value})`).trigger("click");
 				break;
 			case "toggle-sidebar":
 				if (event.value === "show") isOn = false;

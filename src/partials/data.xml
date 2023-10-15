@@ -1,13 +1,13 @@
 <!-- 
-	<i username="bill" type="camera" inbound="1" stamp="1621893635071" duration="50" />
-	<i username="sarienn" type="voice" inbound="0" stamp="1623362435072" duration="213" />
-	<i username="sarienn" type="camera" inbound="1" stamp="1621029635073" duration="174" />
-	<i username="bill" type="camera" inbound="0" stamp="1620943235074" duration="174" />
-	<i username="steve" type="voice" inbound="1" stamp="1618351235076" duration="0" />
 -->
 
 <Data>
 	<History>
 		<!-- history log goes here -->
+	<i username="bill" type="camera" inbound="1" stamp="1621893635071" duration="50" />
+	<i username="sarienn" type="voice" inbound="0" stamp="1623362435072" duration="213" />
+	<i username="sarienn" type="camera" inbound="1" stamp="1621029635073" duration="174" />
+	<i username="bill" type="camera" inbound="0" stamp="1620943235074" duration="174" />
+	<i username="steve" type="voice" inbound="1" stamp="1618351235076" duration="0" />
 	</History>
 </Data>
