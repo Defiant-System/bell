@@ -35,6 +35,21 @@ const bell = {
 		switch (event.type) {
 			// system events
 			case "window.init":
+				// return;
+				// initiate camera
+				navigator.mediaDevices
+					.getUserMedia({ video: true, audio: true })
+					.then(stream => {
+						let video = Self.sidebar.els.videoMe[0];
+						
+						Self.stream = stream;
+
+						video.srcObject = stream;
+						video.muted = karaqu.env === "dev";
+						video.addEventListener("loadedmetadata", () => {
+							video.play();
+						});
+					});
 				break;
 			case "window.close":
 				// save settings
