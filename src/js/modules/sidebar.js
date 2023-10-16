@@ -9,9 +9,6 @@
 			sidebar: window.find(".sidebar"),
 			sidebarToggler: window.find(".sidebar-toggler"),
 			callList: window.find(".call-list .list-wrapper"),
-			videoCall: window.find(".video-call"),
-			videoMe: window.find(".me video"),
-			videoOther: window.find(".other"),
 		};
 		// listen to system event
 		karaqu.on("sys:friend-status", this.dispatch);
@@ -26,7 +23,6 @@
 			prepend,
 			user,
 			value,
-			isOn,
 			str,
 			pEl,
 			el;
@@ -41,21 +37,20 @@
 				el.removeClass("online offline").addClass(value);
 				break;
 			// custom events
+			case "start-camera-call":
+				el = event.el.parents(`div[data-username]`);
+				APP.call.dispatch({ type: "outbound-camera-request", to: el.data("username") });
+				break;
+			case "start-voice-call":
+				el = event.el.parents(`div[data-username]`);
+				APP.call.dispatch({ type: "outbound-voice-request", to: el.data("username") });
+				break;
 			case "apply-settings":
 				if (APP.settings.sidebar.expanded) {
 					Self.els.sidebarToggler.find("> i").trigger("click");
 				}
 				value = APP.settings.sidebar["active-tab"];
 				Self.els.sidebar.find(`.tab-row > div:nth(${value})`).trigger("click");
-				break;
-			case "toggle-sidebar":
-				if (event.value === "hide") isOn = true;
-				else {
-					isOn = event.el.hasClass("push-in");
-				}
-
-				Self.els.sidebarToggler.toggleClass("push-in", isOn);
-				Self.els.sidebar.toggleClass("open", isOn);
 				break;
 			case "select-tab":
 				el = event.el;
