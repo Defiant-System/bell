@@ -9,6 +9,7 @@
 			sidebar: window.find(".sidebar"),
 			sidebarToggler: window.find(".sidebar-toggler"),
 			callList: window.find(".call-list .list-wrapper"),
+			input: window.find(".sidebar .input-wrapper input"),
 		};
 		// listen to system event
 		karaqu.on("sys:friend-status", this.dispatch);
@@ -29,6 +30,13 @@
 		// console.log(event);
 		switch (event.type) {
 			// system events
+			case "window.keyup":
+				value = Self.els.input.val().toLowerCase();
+				Self.els.callList
+					.find(".call-entry").addClass("collapse")
+					.filter(e => e.getAttribute("data-name").toLowerCase().startsWith(value))
+					.removeClass("collapse");
+				break;
 			case "friend-status":
 				user = event.detail.username;
 				value = event.detail.status === 1 ? "online" : "offline";
@@ -107,12 +115,10 @@
 				});
 				// remove attribute from log entry
 				xNode.removeAttribute("_new");
-
-				requestAnimationFrame(() => {
-					el.cssSequence("entry-reveal", "transitionend", elem => {
-						elem.removeClass("entry-reveal anim-entry-prepend");
-					});
-				});
+				// animation on next tick
+				requestAnimationFrame(() =>
+					el.cssSequence("entry-reveal", "transitionend", elem =>
+						elem.removeClass("entry-reveal anim-entry-prepend")));
 				break;
 		}
 	}

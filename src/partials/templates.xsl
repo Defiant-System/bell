@@ -38,6 +38,7 @@
 	<xsl:variable name="user" select="//Friends/i[@id = current()/@username]"/>
 	<div>
 		<xsl:attribute name="data-username"><xsl:value-of select="$user/@id"/></xsl:attribute>
+		<xsl:attribute name="data-name"><xsl:value-of select="$user/@name"/></xsl:attribute>
 		<xsl:attribute name="data-stamp"><xsl:value-of select="@stamp"/></xsl:attribute>
 		<xsl:attribute name="class">
 			call-entry

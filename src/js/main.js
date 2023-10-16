@@ -33,6 +33,7 @@ const bell = {
 			value,
 			pEl,
 			el;
+		// console.log(event);
 		switch (event.type) {
 			// system events
 			case "window.init":

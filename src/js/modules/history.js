@@ -38,7 +38,6 @@
 					let timestamp = new karaqu.Moment(+call.getAttribute("stamp"));
 					call.setAttribute("timestamp", timestamp.format("ddd D MMM, HH:mm"));
 				});
-
 				// apply user settings on sidebar
 				APP.sidebar.dispatch({ type: "apply-settings" });
 				break;

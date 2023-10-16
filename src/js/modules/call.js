@@ -115,6 +115,15 @@
 				Self.els.videoCall.prop({ className: `video-call ongoing-${Self.data.type}-call` });
 				break;
 			case "end-call":
+				// call was answered - add time stamp and calculate duration
+				data = {
+					user1: "bill",
+					user2: "hbi",
+					type: "voice",
+					stamp: Date.now(),
+					duration: 143,
+				};
+				APP.sidebar.dispatch({ type: "log-call", data });
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
