@@ -5,7 +5,7 @@
 let Pref = {
 		"clear-history-log": 604800,  // Seven days: 7*24*60*60
 		"sidebar": {
-			"expanded": true,
+			"expanded": false,
 			"active-tab": 0,
 		},
 	};
@@ -35,23 +35,26 @@ const bell = {
 		switch (event.type) {
 			// system events
 			case "window.init":
-				// return;
+				return;
 				// initiate camera
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
 						let video = Self.sidebar.els.videoMe[0];
-						
+						// save reference to stream
 						Self.stream = stream;
 
 						video.srcObject = stream;
 						video.muted = karaqu.env === "dev";
-						video.addEventListener("loadedmetadata", () => {
-							video.play();
-						});
+						video.addEventListener("loadedmetadata", () => video.play());
 					});
 				break;
 			case "window.close":
+				// disconnect camera stream
+				if (Self.stream) {
+					Self.els.videoMe[0].src = "";
+					Self.stream.getTracks().map(item => item.stop());
+				}
 				// save settings
 				window.settings.setItem("settings", Self.settings);
 				break;

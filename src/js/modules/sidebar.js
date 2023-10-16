@@ -7,7 +7,7 @@
 		this.els = {
 			content: window.find("content"),
 			sidebar: window.find(".sidebar"),
-			sidebarToggler: window.find(".sidebar-toggler > i"),
+			sidebarToggler: window.find(".sidebar-toggler"),
 			callList: window.find(".call-list .list-wrapper"),
 			videoCall: window.find(".video-call"),
 			videoMe: window.find(".me video"),
@@ -43,27 +43,19 @@
 			// custom events
 			case "apply-settings":
 				if (APP.settings.sidebar.expanded) {
-					Self.els.sidebarToggler.trigger("click");
+					Self.els.sidebarToggler.find("> i").trigger("click");
 				}
 				value = APP.settings.sidebar["active-tab"];
 				Self.els.sidebar.find(`.tab-row > div:nth(${value})`).trigger("click");
 				break;
 			case "toggle-sidebar":
-				if (event.value === "show") isOn = false;
-				isOn = isOn || Self.els.sidebarToggler.hasClass("push-in");
-				Self.els.sidebarToggler.toggleClass("push-in", isOn);
-
-				if (isOn) {
-					Self.els.sidebar.removeClass("open");
-				} else {
-					Self.els.sidebar.cssSequence("open", "transitionend", sEl => {
-						el = Self.els.callList.find(".anim-entry-prepend");
-						if (event.value !== "show" || !el.length) return;
-						// animate call entry
-						el.cssSequence("entry-reveal", "transitionend", el =>
-							el.removeClass("anim-entry-prepend entry-reveal"));
-					});
+				if (event.value === "hide") isOn = true;
+				else {
+					isOn = event.el.hasClass("push-in");
 				}
+
+				Self.els.sidebarToggler.toggleClass("push-in", isOn);
+				Self.els.sidebar.toggleClass("open", isOn);
 				break;
 			case "select-tab":
 				el = event.el;
