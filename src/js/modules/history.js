@@ -23,6 +23,12 @@
 	dispatch(event) {
 		let APP = bell,
 			Self = APP.history,
+			xNode,
+			isMe,
+			timestamp,
+			username,
+			inbound,
+			str,
 			el;
 		// console.log(event);
 		switch (event.type) {
@@ -36,6 +42,21 @@
 				// apply user settings on sidebar
 				APP.sidebar.dispatch({ type: "apply-settings" });
 				break;
+			case "log-call":
+				isMe = ME.username === event.data.user1;
+				username = isMe ? event.data.user2 : event.data.user1;
+				inbound = ME.username === event.data.user2 ? 1 : 0;
+				timestamp = new karaqu.Moment(+event.data.stamp);
+				str = `<i username="${username}"
+							inbound="${inbound}"
+							type="${event.data.type}"
+							stamp="${event.data.stamp}"
+							timestamp="${timestamp.format("ddd D MMM, HH:mm")}"
+							duration="${event.data.duration}"
+							_new="1"/>`;
+				// add entry to call log
+				xNode = Self.xData.insertBefore($.nodeFromString(str), Self.xData.firstChild);
+				return xNode;
 		}
 	}
 }

@@ -120,8 +120,18 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
 			case "decline-call":
+				// call was not answered - add time stamp and "0" as duration
+				data = {
+					user1: "bill",
+					user2: "hbi",
+					type: "voice",
+					stamp: Date.now(),
+					duration: 0,
+				};
+				APP.sidebar.dispatch({ type: "log-call", data });
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: "video-call" });
+				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
 
 			case "accept": break;

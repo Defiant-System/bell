@@ -92,6 +92,28 @@
 						break;
 				}
 				break;
+			case "log-call":
+				// add entry to call log
+				xNode = APP.history.dispatch(event);
+				// list wrapper
+				prepend = Self.els.callList;
+				// skip adding if friends tab is active
+				if (prepend.hasClass("list-friends")) return;
+				// add entry to DOM
+				el = window.render({
+					template: "call-entry",
+					match: `//Data/History/*[1]`,
+					prepend,
+				});
+				// remove attribute from log entry
+				xNode.removeAttribute("_new");
+
+				requestAnimationFrame(() => {
+					el.cssSequence("entry-reveal", "transitionend", elem => {
+						elem.removeClass("entry-reveal anim-entry-prepend");
+					});
+				});
+				break;
 		}
 	}
 }

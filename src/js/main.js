@@ -10,6 +10,7 @@ let Pref = {
 		},
 	};
 
+const ME = karaqu.user;
 
 const bell = {
 	init() {
