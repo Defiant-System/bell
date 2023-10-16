@@ -13,6 +13,7 @@
 		<xsl:if test="not(@me)">
 			<div>
 				<xsl:attribute name="data-username"><xsl:value-of select="@id"/></xsl:attribute>
+				<xsl:attribute name="data-name"><xsl:value-of select="@name"/></xsl:attribute>
 				<xsl:attribute name="class">
 					friend
 					<xsl:if test="@status = 1"> online</xsl:if>

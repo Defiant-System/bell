@@ -33,7 +33,7 @@
 			case "window.keyup":
 				value = Self.els.input.val().toLowerCase();
 				Self.els.callList
-					.find(".call-entry").addClass("collapse")
+					.find("> div[data-name]").addClass("collapse")
 					.filter(e => e.getAttribute("data-name").toLowerCase().startsWith(value))
 					.removeClass("collapse");
 				break;
@@ -67,6 +67,9 @@
 
 				el.parent().find(".tab-active").removeClass("tab-active");
 				el.addClass("tab-active");
+
+				// reset input field
+				Self.els.input.val("");
 
 				target = Self.els.callList.removeClass("list-all list-missed list-friends");
 				target.addClass(`list-${value}`);
