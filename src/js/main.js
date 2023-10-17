@@ -6,7 +6,7 @@ let Pref = {
 		"clear-history-log": 604800,  // Seven days: 7*24*60*60
 		"sidebar": {
 			"expanded": true,
-			"active-tab": 0,
+			"active-tab": 2,
 		},
 	};
 

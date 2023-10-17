@@ -132,16 +132,17 @@ content {
 				font-size: 0;
 
 				> div {
-					background: #666;
+					background: rgba(#fff,.15);
 					color: #bbb;
 					position: relative;
 					display: inline-block;
 					padding: 4px 13px 3px;
 					font-size: 12px;
-					border-left: 1px solid rgba(#000,.25);
+					margin-left: 1px;
 
 					&:first-child {
 						border-radius: 4px 0 0 4px;
+						margin-left: 0;
 
 						&.tab-active:after {
 							content: "";
@@ -159,9 +160,8 @@ content {
 					}
 
 					&.tab-active {
-						background: #aaa;
+						background: rgba(#fff,.3);
 						color: #fff;
-						border-left-color: transparent;
 						text-shadow: 0 1px 0 #555;
 						z-index: 2;
 

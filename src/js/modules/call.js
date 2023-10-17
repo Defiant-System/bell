@@ -143,9 +143,9 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
 
-			case "accept": break;
-			case "hang-up": break;
-			case "decline": break;
+			case "receive-accept": break;
+			case "receive-hang-up": break;
+			case "receive-decline": break;
 		}
 	}
 }
