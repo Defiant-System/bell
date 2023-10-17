@@ -64,10 +64,10 @@
 				el = event.el;
 				value = el.data("arg");
 				if (el.hasClass("tab-active")) return;
-
 				el.parent().find(".tab-active").removeClass("tab-active");
 				el.addClass("tab-active");
-
+				// reset potential "new" entries
+				APP.history.xData.selectNodes(`//*[@_new]`).map(x => x.removeAttribute("_new"));
 				// reset input field
 				Self.els.input.val("");
 
