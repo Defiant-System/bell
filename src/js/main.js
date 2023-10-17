@@ -45,6 +45,9 @@ const bell = {
 				window.settings.setItem("settings", Self.settings);
 				break;
 			// custom events
+			case "net.receive":
+				// dispatch event to call-object
+				return Self.call.receive(event);
 			default:
 				el = event.el;
 				if (event.origin) el = event.origin.el;

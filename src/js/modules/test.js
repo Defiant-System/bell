@@ -1,7 +1,12 @@
 
 let Test = {
 	init(APP) {
-		// return;
+		return;
+
+		if (ME.username === "bill") {
+			let selector = `.friend[data-username="hbi"] div[data-click="start-camera-call"]`;
+			setTimeout(() => APP.sidebar.els.sidebar.find(selector).trigger("click"), 1e3);
+		}
 
 		// setTimeout(() => APP.call.dispatch({
 		// 	type: "inbound-voice-request", from: "bill",

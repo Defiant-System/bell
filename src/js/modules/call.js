@@ -106,6 +106,28 @@
 				Self.els.callTitle.find(".user").html(user.name);
 				Self.els.videoCall.addClass("outbound-camera-request");
 				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
+
+				// send call request
+				window.net.send({
+					action: "initiate",
+					from: ME.username,
+					fromName: ME.name,
+					to: user.username,
+					channel: `camera:${window.peer.id}`,
+					message: `<b>${ME.name}</b> is calling you.`,
+					options: [
+						{
+							id: karaqu.AFFIRMATIVE,
+							name: "Accept",
+							payload: "action,channel",
+						},
+						{
+							id: karaqu.NEGATIVE,
+							name: "Decline",
+							payload: "action,channel",
+						}
+					]
+				});
 				break;
 			
 			// call related
@@ -113,39 +135,150 @@
 				user = karaqu.user.friend(Self.els.videoCall.data("username"));
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: `video-call ongoing-${Self.data.type}-call` });
+
+				// send response to call request
+				window.net.send({
+					action: "accept",
+					from: ME.username,
+					fromName: ME.name,
+					to: Self.els.videoCall.data("username"),
+				});
 				break;
 			case "end-call":
-				// call was answered - add time stamp and calculate duration
-				data = {
-					user1: "bill",
-					user2: "hbi",
-					type: "voice",
-					stamp: Date.now(),
-					duration: 143,
-				};
-				APP.sidebar.dispatch({ type: "log-call", data });
-				// adapt screen based up on call type
-				Self.els.videoCall.prop({ className: "video-call" });
-				Self.dispatch({ type: "toggle-sidebar", value: "show" });
-				break;
 			case "decline-call":
-				// call was not answered - add time stamp and "0" as duration
-				data = {
-					user1: "bill",
-					user2: "hbi",
-					type: "voice",
-					stamp: Date.now(),
-					duration: 0,
-				};
+				// call was answered - add time stamp and calculate duration
+				data = { ...Self.data };
+				data.duration = Math.round((Date.now() - Self.data.stamp) / 1000);
+
 				APP.sidebar.dispatch({ type: "log-call", data });
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
-				break;
 
-			case "receive-accept": break;
-			case "receive-hang-up": break;
-			case "receive-decline": break;
+				// send response to call request
+				window.net.send({
+					action: "decline",
+					from: ME.username,
+					fromName: ME.name,
+					to: Self.els.videoCall.data("username"),
+				});
+				break;
+		}
+	},
+	receive(event) {
+		let APP = bell,
+			Self = APP.call,
+			action,
+			data,
+			user,
+			type,
+			id,
+			from,
+			to,
+			el;
+		// console.log(event);
+		switch (event.action) {
+			case "initiate":
+				[type, id] = event.channel.split(":");
+
+				// reference data for active call
+				Self.data = {
+					type,
+					user1: event.from,
+					user2: event.to,
+					channel: event.channel,
+					stamp: Date.now(),
+				};
+
+				// adapt screen based up on call type
+				if (event.from === ME.username) {
+					user = karaqu.user.friend(event.to);
+					Self.els.videoCall.data({ "username": user.username });
+					Self.els.callTitle.find(".verb").html( karaqu.i18n("Calling") );
+					Self.els.callTitle.find(".user").html( user.name );
+					Self.dispatch({ type: "toggle-sidebar", value: "hide" });
+					Self.els.videoCall.addClass(`outbound-${type}-request`);
+				} else {
+					if (!Self.stream) {
+						// if camera stream has not yet finish initiate - wait & try again
+						// return setTimeout(() => Self.receive(event), 200);
+					}
+					user = karaqu.user.friend(event.from);
+					Self.els.videoCall.data({ "username": user.username });
+					Self.els.callTitle.find(".verb").html( karaqu.i18n("is calling") );
+					Self.els.callTitle.find(".user").html( user.name );
+					Self.dispatch({ type: "toggle-sidebar", value: "hide" });
+					Self.els.videoCall.addClass(`inbound-${type}-request`);
+
+					// if (event.response !== undefined) {
+					// 	action = (event.response === karaqu.AFFIRMATIVE) ? "accept" : "decline";
+					// 	APP.dispatch({ ...event, action, type: action +"-call" });
+					// }
+				}
+				break;
+			case "accept":
+				user = karaqu.user.friend(Self.els.videoCall.data("username"));
+				// call answered - add time stamp
+				Self.data.stamp = Date.now();
+				// adapt screen based up on call type
+				Self.els.videoCall.prop({ className: `video-call ongoing-${Self.data.type}-call` });
+
+				if (event.from === ME.username) {
+					Self.peer.connect();
+					user.uuid = Self.data.channel.split(":")[1];
+					Self.peer.call(user, Self.stream);
+				} else {
+					Self.peer.connect();
+				}
+				break;
+			case "hang-up":
+			case "decline":
+				// reset screen
+				Self.els.videoCall.prop({ className: "video-call" });
+				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				break;
+		}
+	},
+	peer: {
+		connect() {
+			let Self = bell.call;
+			// establish connection
+			Self.connection = window.peer.connect({
+				// on events
+				call: this.receiveCall.bind(this)
+			});
+			//Call.connection.on("call", this.receiveCall.bind(this));
+		},
+		call(user, stream) {
+			let Self = bell.call;
+			Self.mediaConnection = Self.connection.call(user.uuid, stream);
+
+			Self.mediaConnection.on("stream", this.receiveStream.bind(this));
+			Self.mediaConnection.on("close", this.disconnect.bind(this));
+		},
+		receiveCall(mediaConnection) {
+			let Self = bell.call;
+			Self.mediaConnection = mediaConnection;
+
+			mediaConnection.answer(Self.stream);
+			mediaConnection.on("stream", this.receiveStream.bind(this));
+		},
+		receiveStream(userStream) {
+			let Self = bell.call,
+				videoEl = Self.els.videoOther.find("video")[0];
+
+			videoEl.srcObject = userStream;
+			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
+		},
+		disconnect() {
+			let Self = bell.call;
+
+			if (Self.mediaConnection) {
+				Self.mediaConnection.close();
+			}
+
+			//delete bell.els.videoOther.find("video").srcObject;
+			Self.els.videoOther.html("<video></video>");
 		}
 	}
 }
