@@ -138,9 +138,26 @@
 				});
 				break;
 			case "end-call":
+				// call was answered - add time stamp and calculate duration
+				data = { ...Self.data };
+				data.duration = Math.round((Date.now() - Self.data.stamp) / 1000);
+
+				APP.sidebar.dispatch({ type: "log-call", data });
+				// adapt screen based up on call type
+				Self.els.videoCall.prop({ className: "video-call" });
+				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+
+				// send response to call request
+				window.net.send({
+					action: "hang-up",
+					from: ME.username,
+					fromName: ME.name,
+					to: Self.els.videoCall.data("username"),
+				});
+				break;
 			case "decline-call":
 				[action, type] = event.type.split("-");
-				// call was answered - add time stamp and calculate duration
+				// call was not answered - add time stamp
 				data = { ...Self.data };
 				data.duration = Math.round((Date.now() - Self.data.stamp) / 1000);
 
@@ -228,6 +245,10 @@
 				}
 				break;
 			case "hang-up":
+				// reset screen
+				Self.els.videoCall.prop({ className: "video-call" });
+				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				break;
 			case "decline":
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
