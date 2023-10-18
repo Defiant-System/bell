@@ -15,14 +15,6 @@
 		// default
 		this.isCameraOff = false;
 		this.isMute = false;
-
-		// temp
-		this.data = {
-			type: "camera", // voice camera
-			user1: "bill",
-			user2: "hbi",
-			channel: "123",
-		};
 	},
 	dispatch(event) {
 		let APP = bell,
@@ -108,11 +100,12 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 
 				// send call request
-				window.net.send({
+				Self.activeMessageId = window.net.send({
 					action: "initiate",
 					from: ME.username,
 					fromName: ME.name,
 					to: user.username,
+					nolog: true,
 					channel: `camera:${window.peer.id}`,
 					message: `<b>${ME.name}</b> is calling you.`,
 					options: [
@@ -126,19 +119,20 @@
 							name: "Decline",
 							payload: "action,channel",
 						}
-					]
+					],
 				});
 				break;
 			
 			// call related
 			case "accept-call":
+				[action, type] = event.type.split("-");
 				user = karaqu.user.friend(Self.els.videoCall.data("username"));
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: `video-call ongoing-${Self.data.type}-call` });
 
 				// send response to call request
 				window.net.send({
-					action: "accept",
+					action,
 					from: ME.username,
 					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
@@ -146,6 +140,7 @@
 				break;
 			case "end-call":
 			case "decline-call":
+				[action, type] = event.type.split("-");
 				// call was answered - add time stamp and calculate duration
 				data = { ...Self.data };
 				data.duration = Math.round((Date.now() - Self.data.stamp) / 1000);
@@ -157,10 +152,12 @@
 
 				// send response to call request
 				window.net.send({
-					action: "decline",
+					action,
 					from: ME.username,
 					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
+					message: `<b>${ME.name}</b> tried calling you.`,
+					forget: Self.activeMessageId,
 				});
 				break;
 		}
@@ -236,6 +233,11 @@
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				break;
+			case "response":
+				if (event.response === false) {
+					Self.receive({ action: "decline" });
+				}
 				break;
 		}
 	},

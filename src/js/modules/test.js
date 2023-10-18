@@ -1,7 +1,7 @@
 
 let Test = {
 	init(APP) {
-		return;
+		// return;
 
 		if (ME.username === "bill") {
 			let selector = `.friend[data-username="hbi"] div[data-click="start-camera-call"]`;
