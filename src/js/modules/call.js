@@ -30,7 +30,6 @@
 		// console.log(event);
 		switch (event.type) {
 			case "init-camera":
-				return;
 				// initiate camera
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
@@ -198,7 +197,7 @@
 				} else {
 					if (!Self.stream) {
 						// if camera stream has not yet finish initiate - wait & try again
-						// return setTimeout(() => Self.receive(event), 200);
+						return setTimeout(() => Self.receive(event), 500);
 					}
 					user = karaqu.user.friend(event.from);
 					Self.els.videoCall.data({ "username": user.username });
@@ -207,10 +206,10 @@
 					Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 					Self.els.videoCall.addClass(`inbound-${type}-request`);
 
-					// if (event.response !== undefined) {
-					// 	action = (event.response === karaqu.AFFIRMATIVE) ? "accept" : "decline";
-					// 	APP.dispatch({ ...event, action, type: action +"-call" });
-					// }
+					if (event.response !== undefined) {
+						action = (event.response === karaqu.AFFIRMATIVE) ? "accept" : "decline";
+						Self.dispatch({ ...event, action, type: action +"-call" });
+					}
 				}
 				break;
 			case "accept":
@@ -234,6 +233,7 @@
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
+			// this is response via "notification"
 			case "response":
 				if (event.response === false) {
 					Self.receive({ action: "decline" });

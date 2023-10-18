@@ -1,6 +1,7 @@
 
 let Test = {
 	init(APP) {
+		
 		// return;
 
 		if (ME.username === "bill") {

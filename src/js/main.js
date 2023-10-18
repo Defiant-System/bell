@@ -23,6 +23,8 @@ const bell = {
 			.filter(i => typeof this[i].init === "function")
 			.map(i => this[i].init());
 
+		this.call.dispatch({ type: "init-camera" });
+
 		// DEV-ONLY-START
 		Test.init(this);
 		// DEV-ONLY-END
@@ -37,7 +39,6 @@ const bell = {
 		switch (event.type) {
 			// system events
 			case "window.init":
-				Self.call.dispatch({ type: "init-camera" });
 				break;
 			case "window.close":
 				Self.call.dispatch({ type: "kill-camera" });
