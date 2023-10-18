@@ -1,8 +1,13 @@
 
 let Test = {
 	init(APP) {
-		
+
 		// return;
+
+		// if (ME.username === "hbi") {
+		// 	let selector = `.friend[data-username="bill"] div[data-click="start-voice-call"]`;
+		// 	setTimeout(() => APP.sidebar.els.sidebar.find(selector).trigger("click"), 1e3);
+		// }
 
 		if (ME.username === "bill") {
 			let selector = `.friend[data-username="hbi"] div[data-click="start-camera-call"]`;

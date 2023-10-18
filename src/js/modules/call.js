@@ -83,21 +83,15 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 				break;
 			case "outbound-voice-request":
-				user = karaqu.user.friend(event.to);
-				Self.els.videoCall.data({ "username": user.username });
-				Self.els.callTitle.find(".verb").html(karaqu.i18n("Calling"));
-				Self.els.callTitle.find(".user").html(user.name);
-				Self.els.videoCall.addClass("outbound-voice-request");
-				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
-				break;
 			case "outbound-camera-request":
 				user = karaqu.user.friend(event.to);
 				Self.els.videoCall.data({ "username": user.username });
 				Self.els.callTitle.find(".verb").html(karaqu.i18n("Calling"));
 				Self.els.callTitle.find(".user").html(user.name);
-				Self.els.videoCall.addClass("outbound-camera-request");
+				Self.els.videoCall.addClass(event.type);
 				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
-
+				// extract request type
+				type = event.type.split("-")[1];
 				// send call request
 				Self.activeMessageId = window.net.send({
 					action: "initiate",
@@ -105,7 +99,7 @@
 					fromName: ME.name,
 					to: user.username,
 					nolog: true,
-					channel: `camera:${window.peer.id}`,
+					channel: `${type}:${window.peer.id}`,
 					message: `<b>${ME.name}</b> is calling you.`,
 					options: [
 						{
@@ -245,11 +239,15 @@
 				}
 				break;
 			case "hang-up":
+				// disconnect p2p, if any
+				Self.peer.disconnect();
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				break;
 			case "decline":
+				// disconnect p2p, if any
+				Self.peer.disconnect();
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
@@ -270,26 +268,23 @@
 				// on events
 				call: this.receiveCall.bind(this)
 			});
-			//Call.connection.on("call", this.receiveCall.bind(this));
+			// Self.connection.on("call", this.receiveCall.bind(this));
 		},
 		call(user, stream) {
 			let Self = bell.call;
 			Self.mediaConnection = Self.connection.call(user.uuid, stream);
-
 			Self.mediaConnection.on("stream", this.receiveStream.bind(this));
 			Self.mediaConnection.on("close", this.disconnect.bind(this));
 		},
 		receiveCall(mediaConnection) {
 			let Self = bell.call;
 			Self.mediaConnection = mediaConnection;
-
-			mediaConnection.answer(Self.stream);
-			mediaConnection.on("stream", this.receiveStream.bind(this));
+			Self.mediaConnection.answer(Self.stream);
+			Self.mediaConnection.on("stream", this.receiveStream.bind(this));
 		},
 		receiveStream(userStream) {
 			let Self = bell.call,
 				videoEl = Self.els.videoOther.find("video")[0];
-
 			videoEl.srcObject = userStream;
 			videoEl.addEventListener("loadedmetadata", () => videoEl.play());
 		},
@@ -299,7 +294,8 @@
 			if (Self.mediaConnection) {
 				Self.mediaConnection.close();
 			}
-
+			// disconnect connection
+			Self.connection.disconnect();
 			//delete bell.els.videoOther.find("video").srcObject;
 			Self.els.videoOther.html("<video></video>");
 		}
