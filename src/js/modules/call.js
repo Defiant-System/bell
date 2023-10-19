@@ -12,6 +12,8 @@
 			videoMe: window.find(".me video"),
 			videoOther: window.find(".other"),
 		};
+		// used when camera is "off"
+		this.dispatch({ type: "init-stream-canvas" });
 		// default
 		this.isCameraOff = false;
 		this.isMute = false;
@@ -25,7 +27,7 @@
 			type,
 			from,
 			isOn,
-			to,
+			str,
 			el;
 		// console.log(event);
 		switch (event.type) {
@@ -38,10 +40,17 @@
 						let video = Self.els.videoMe[0];
 						// save reference to stream
 						Self.stream = stream;
+						Self.cameraTrack = stream.getVideoTracks()[0];
 
-						video.srcObject = stream;
-						video.muted = karaqu.env === "dev";
+						// console.log( stream.getAudioTracks() );
+						// console.log( stream.getVideoTracks() );
+						// console.log( stream );
+
+						video.srcObject = Self.stream;
 						video.addEventListener("loadedmetadata", () => video.play());
+						if (karaqu.env === "dev") {
+							Self.dispatch({ type: "toggle-microphone", value: "off" });
+						}
 					});
 				break;
 			case "kill-camera":
@@ -51,6 +60,24 @@
 					Self.stream.getTracks().map(item => item.stop());
 				}
 				break;
+			case "init-stream-canvas":
+				Self.cvs = document.createElement("canvas");
+				Self.ctx = Self.cvs.getContext("2d", { willReadFrequently: true });
+				Self.cvs.width = window.innerWidth;
+				Self.cvs.height = window.innerHeight;
+
+				Self.blankStream = Self.cvs.captureStream(1);
+				Self.canvasTrack = Self.blankStream.getVideoTracks()[0];
+				break;
+			case "render-stream-canvas":
+				Self.ctx.fillStyle = "#369";
+				Self.ctx.fillRect(0,0,1e3,1e3);
+				Self.ctx.textAlign = "center";
+				Self.ctx.textBaseline = "middle";
+				Self.ctx.font = "50px Roboto";
+				Self.ctx.fillStyle = "#fff";
+				Self.ctx.fillText(ME.name, window.innerWidth >> 1, window.innerHeight >> 1);
+				break;
 			// custom events
 			case "toggle-sidebar":
 				if (event.value) isOn = event.value === "hide";
@@ -59,11 +86,19 @@
 				Self.els.sidebar.toggleClass("open", isOn);
 				break;
 			case "toggle-camera":
-				event.el.find("> i").toggleClass("icon-camera-off", Self.isCameraOff);
+				Self.els.videoCall.find(".camera > i").toggleClass("icon-camera-off", Self.isCameraOff);
 				Self.isCameraOff = !Self.isCameraOff;
+
+				Self.dispatch({ type: "render-stream-canvas" });
+				Self.mediaConnection.peerConnection.getSenders()[1]
+					.replaceTrack(Self.isCameraOff ? Self.canvasTrack : Self.cameraTrack);
 				break;
 			case "toggle-microphone":
-				event.el.find("> i").toggleClass("icon-mic-mute", Self.isMute);
+				isOn = event.value === "off" ? false : !Self.isMute;
+				// audio on vide element
+				Self.els.videoMe[0].muted = isOn;
+				// ui update
+				Self.els.videoCall.find(".microphone > i").toggleClass("icon-mic-mute", Self.isMute);
 				Self.isMute = !Self.isMute;
 				break;
 			// UI updates
