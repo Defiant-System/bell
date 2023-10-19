@@ -61,6 +61,7 @@
 				}
 				break;
 			case "init-stream-canvas":
+				// this canvas is "placeholder" for when user turns of camera
 				Self.cvs = document.createElement("canvas");
 				Self.ctx = Self.cvs.getContext("2d", { willReadFrequently: true });
 				Self.cvs.width = window.innerWidth;
@@ -80,14 +81,6 @@
 				} else {
 					Self.dispatch({ type: "draw-user-avatar" });
 				}
-
-				// Self.ctx.fillStyle = "#369";
-				// Self.ctx.fillRect(0,0,1e3,1e3);
-				// Self.ctx.textAlign = "center";
-				// Self.ctx.textBaseline = "middle";
-				// Self.ctx.font = "50px Roboto";
-				// Self.ctx.fillStyle = "#fff";
-				// Self.ctx.fillText(ME.name, window.innerWidth >> 1, window.innerHeight >> 1);
 				break;
 			case "draw-user-avatar":
 				Self.ctx.fillStyle = "#369";
@@ -180,6 +173,8 @@
 					from: ME.username,
 					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
+					message: `<b>${ME.name}</b> tried calling you.`,
+					forget: Self.activeMessageId,
 				});
 				break;
 			case "decline-call":
@@ -199,8 +194,6 @@
 					from: ME.username,
 					fromName: ME.name,
 					to: Self.els.videoCall.data("username"),
-					message: `<b>${ME.name}</b> tried calling you.`,
-					forget: Self.activeMessageId,
 				});
 				break;
 		}
