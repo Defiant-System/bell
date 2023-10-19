@@ -41,10 +41,10 @@
 						// save reference to stream
 						Self.stream = stream;
 						Self.cameraTrack = stream.getVideoTracks()[0];
-
-						// console.log( stream.getAudioTracks() );
-						// console.log( stream.getVideoTracks() );
-						// console.log( stream );
+						
+						// Self.stream = Self.blankStream;
+						// Self.dispatch({ type: "render-stream-canvas" });
+						// Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 
 						video.srcObject = Self.stream;
 						video.addEventListener("loadedmetadata", () => video.play());
@@ -70,13 +70,31 @@
 				Self.canvasTrack = Self.blankStream.getVideoTracks()[0];
 				break;
 			case "render-stream-canvas":
+				if (!Self.userAvatar) {
+					let img = new Image;
+					img.onload = () => {
+						Self.userAvatar = img;
+						Self.dispatch({ type: "draw-user-avatar" });
+					};
+					img.src = `/res/avatar/${ME.username}.jpg`;
+				} else {
+					Self.dispatch({ type: "draw-user-avatar" });
+				}
+
+				// Self.ctx.fillStyle = "#369";
+				// Self.ctx.fillRect(0,0,1e3,1e3);
+				// Self.ctx.textAlign = "center";
+				// Self.ctx.textBaseline = "middle";
+				// Self.ctx.font = "50px Roboto";
+				// Self.ctx.fillStyle = "#fff";
+				// Self.ctx.fillText(ME.name, window.innerWidth >> 1, window.innerHeight >> 1);
+				break;
+			case "draw-user-avatar":
 				Self.ctx.fillStyle = "#369";
 				Self.ctx.fillRect(0,0,1e3,1e3);
-				Self.ctx.textAlign = "center";
-				Self.ctx.textBaseline = "middle";
-				Self.ctx.font = "50px Roboto";
-				Self.ctx.fillStyle = "#fff";
-				Self.ctx.fillText(ME.name, window.innerWidth >> 1, window.innerHeight >> 1);
+				Self.ctx.drawImage(Self.userAvatar,
+					(window.innerWidth - Self.userAvatar.width) * .5,
+					(window.innerHeight - Self.userAvatar.height) * .5);
 				break;
 			// custom events
 			case "toggle-sidebar":
