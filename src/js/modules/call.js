@@ -30,6 +30,7 @@
 		// console.log(event);
 		switch (event.type) {
 			case "init-camera":
+				// return;
 				// initiate camera
 				navigator.mediaDevices
 					.getUserMedia({ video: true, audio: true })
@@ -66,30 +67,9 @@
 				Self.isMute = !Self.isMute;
 				break;
 			// UI updates
-			case "inbound-voice-request":
-				user = karaqu.user.friend(event.from);
-				Self.els.videoCall.data({ "username": user.username });
-				Self.els.callTitle.find(".verb").html(karaqu.i18n("is calling"));
-				Self.els.callTitle.find(".user").html(user.name);
-				Self.els.videoCall.addClass("inbound-voice-request");
-				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
-				break;
-			case "inbound-camera-request":
-				user = karaqu.user.friend(event.from);
-				Self.els.videoCall.data({ "username": user.username });
-				Self.els.callTitle.find(".verb").html(karaqu.i18n("is calling"));
-				Self.els.callTitle.find(".user").html(user.name);
-				Self.els.videoCall.addClass("inbound-camera-request");
-				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
-				break;
 			case "outbound-voice-request":
 			case "outbound-camera-request":
 				user = karaqu.user.friend(event.to);
-				Self.els.videoCall.data({ "username": user.username });
-				Self.els.callTitle.find(".verb").html(karaqu.i18n("Calling"));
-				Self.els.callTitle.find(".user").html(user.name);
-				Self.els.videoCall.addClass(event.type);
-				Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 				// extract request type
 				type = event.type.split("-")[1];
 				// send call request
@@ -200,6 +180,7 @@
 				// adapt screen based up on call type
 				if (event.from === ME.username) {
 					user = karaqu.user.friend(event.to);
+					// outbound UI
 					Self.els.videoCall.data({ "username": user.username });
 					Self.els.callTitle.find(".verb").html( karaqu.i18n("Calling") );
 					Self.els.callTitle.find(".user").html( user.name );
@@ -211,6 +192,7 @@
 						return setTimeout(() => Self.receive(event), 500);
 					}
 					user = karaqu.user.friend(event.from);
+					// inbound UI
 					Self.els.videoCall.data({ "username": user.username });
 					Self.els.callTitle.find(".verb").html( karaqu.i18n("is calling") );
 					Self.els.callTitle.find(".user").html( user.name );
@@ -290,12 +272,14 @@
 		},
 		disconnect() {
 			let Self = bell.call;
-
+			// disconnect mediaConnection, if any
 			if (Self.mediaConnection) {
 				Self.mediaConnection.close();
 			}
-			// disconnect connection
-			Self.connection.disconnect();
+			// disconnect connection, if any
+			if (Self.connection) {
+				Self.connection.disconnect();
+			}
 			//delete bell.els.videoOther.find("video").srcObject;
 			Self.els.videoOther.html("<video></video>");
 		}
