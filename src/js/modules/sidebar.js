@@ -12,7 +12,7 @@
 			input: window.find(".sidebar .input-wrapper input"),
 		};
 		// listen to system event
-		karaqu.on("sys:friend-status", this.dispatch);
+		window.on("sys:friend-status", this.dispatch);
 	},
 	dispatch(event) {
 		let APP = bell,
