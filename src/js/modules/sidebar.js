@@ -45,6 +45,9 @@
 				el.removeClass("online offline").addClass(value);
 				break;
 			// custom events
+			case "add-friend":
+				karaqu.shell("sys -o");
+				break;
 			case "start-camera-call":
 				el = event.el.parents(`div[data-username]`);
 				APP.call.dispatch({ type: "outbound-camera-request", to: el.data("username") });

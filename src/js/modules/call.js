@@ -38,6 +38,10 @@
 					.getUserMedia({ video: true, audio: true })
 					.then(stream => {
 						let video = Self.els.videoMe[0];
+						
+						// turn off audio - to prevent feedback
+						stream.getAudioTracks().map(audioTrack => audioTrack.stop());
+
 						// save reference to stream
 						Self.stream = stream;
 						Self.cameraTrack = stream.getVideoTracks()[0];
