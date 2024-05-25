@@ -13,6 +13,8 @@
 		};
 		// listen to system event
 		window.on("sys:friend-status", this.dispatch);
+		window.on("sys:friend-added", this.dispatch);
+		window.on("sys:friend-removed", this.dispatch);
 	},
 	dispatch(event) {
 		let APP = bell,
@@ -37,12 +39,37 @@
 					.filter(e => e.getAttribute("data-name").toLowerCase().startsWith(value))
 					.removeClass("collapse");
 				break;
+			// subscribed events
 			case "friend-status":
 				user = event.detail.username;
 				value = event.detail.status === 1 ? "online" : "offline";
 				el = Self.els.callList.find(`div[data-username="${user}"]`);
 				// update user status
 				el.removeClass("online offline").addClass(value);
+				break;
+			case "friend-added":
+				if (Self.els.sidebar.find(".tab-active").data("arg") === "friends") {
+					// render channels
+					let vdom = window.render({
+							template: "friends",
+							match: "sys://Settings/Friends",
+							vdom: true
+						});
+					// vdom.find(`.friend`).map(el => console.log(el));
+					let vEl = vdom.find(`.friend[data-username="${event.detail.username}"]`);
+					
+					// insert new friend at "index"
+					pEl = Self.els.sidebar.find(`.list-friends .friend:nth(${vEl.index()-1})`);
+					if (pEl.length) pEl.after(vEl);
+					else Self.els.sidebar.find(`.list-friends`).append(vEl);
+				}
+				break;
+			case "friend-removed":
+				if (Self.els.sidebar.find(".tab-active").data("arg") === "friends") {
+					// remove from view
+					Self.els.sidebar.find(`.list-friends .friend[data-username="${event.detail.username}"]`).remove();
+				}
+				// TODO: delete logs from "//Data" ??
 				break;
 			// custom events
 			case "add-friend":
