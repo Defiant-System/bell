@@ -15,8 +15,7 @@ const ME = karaqu.user;
 const bell = {
 	init() {
 		// get settings, if any
-		// this.settings = window.settings.getItem("settings") || { ...Pref };
-		this.settings = { ...Pref };
+		this.settings = window.settings.getItem("settings") || Pref;
 
 		// init all sub-objects
 		Object.keys(this)
@@ -42,13 +41,34 @@ const bell = {
 				break;
 			case "window.close":
 				Self.call.dispatch({ type: "kill-camera" });
+				// update settings
+				value = Self.sidebar.els.sidebar.hasClass("open");
+				Self.settings.sidebar["expanded"] = value;
+				// update settings
+				value = Self.sidebar.els.sidebar.find(".tab-view .tab-active").index();
+				Self.settings.sidebar["active-tab"] = value;
 				// save settings
 				window.settings.setItem("settings", Self.settings);
 				break;
-			// custom events
+			// network events
 			case "net.receive":
 				// dispatch event to call-object
 				return Self.call.receive(event);
+			// custom events
+			case "voice-call-user":
+			case "camera-call-user":
+				karaqu.shell(`user -i '${event.username}'`)
+					.then(res => {
+						setTimeout(() => {
+							if (res.result.online) {
+								let type = `outbound-${event.type.split("-")[0]}-request`;
+								Self.call.dispatch({ type, to: event.username });
+							} else {
+								// notify failure due to "offline"?
+							}
+						}, 300);
+					});
+				break;
 			default:
 				el = event.el;
 				if (event.origin) el = event.origin.el;

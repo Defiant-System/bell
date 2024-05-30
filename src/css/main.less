@@ -94,6 +94,7 @@ content {
 
 	.sidebar {
 		background: rgba(#000,.6);
+		backdrop-filter: blur(7px);
 		position: absolute;
 		top: 0;
 		bottom: 0;
@@ -105,17 +106,6 @@ content {
 		padding-top: 29px;
 		user-select: none;
 		transition: left 200ms ease-in-out;
-
-		&:before {
-			content: "";
-			backdrop-filter: blur(29px);
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			z-index: -1;
-		}
 
 		&.open {
 			left: 0;
@@ -133,7 +123,7 @@ content {
 				font-size: 0;
 
 				> div {
-					background: rgba(#fff,.15);
+					background: #505050;
 					color: #bbb;
 					position: relative;
 					display: inline-block;
@@ -161,14 +151,10 @@ content {
 					}
 
 					&.tab-active {
-						background: rgba(#fff,.3);
+						background: #666;
 						color: #fff;
 						text-shadow: 0 1px 0 #555;
 						z-index: 2;
-
-						& + div {
-							border-left-color: transparent;
-						}
 					}
 
 					&:not(.tab-active) {
