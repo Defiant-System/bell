@@ -58,6 +58,10 @@
 					});
 				break;
 			case "kill-camera":
+				// stop any ongoing calls or attempt of call
+				if (Self.activeMessageId) {
+					Self.dispatch({ type: "end-call" });
+				}
 				// disconnect camera stream
 				if (Self.stream) {
 					Self.els.videoMe[0].src = "";
@@ -180,6 +184,9 @@
 					message: `<b>${ME.name}</b> tried calling you.`,
 					forget: Self.activeMessageId,
 				});
+
+				// delete reference to call
+				delete Self.activeMessageId;
 				break;
 			case "decline-call":
 				[action, type] = event.type.split("-");
@@ -276,6 +283,8 @@
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				// delete reference to call
+				delete Self.activeMessageId;
 				break;
 			case "decline":
 				// disconnect p2p, if any
@@ -283,11 +292,15 @@
 				// reset screen
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+				// delete reference to call
+				delete Self.activeMessageId;
 				break;
 			// this is response via "notification"
 			case "response":
 				if (event.response === false) {
 					Self.receive({ action: "decline" });
+					// delete reference to call
+					delete Self.activeMessageId;
 				}
 				break;
 		}
