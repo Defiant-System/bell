@@ -62,6 +62,9 @@
 				if (Self.activeMessageId) {
 					Self.dispatch({ type: "end-call" });
 				}
+				if (Self.data) {
+					Self.dispatch({ type: "decline-call" });
+				}
 				// disconnect camera stream
 				if (Self.stream) {
 					Self.els.videoMe[0].src = "";
@@ -285,6 +288,7 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				// delete reference to call
 				delete Self.activeMessageId;
+				delete Self.data;
 				break;
 			case "decline":
 				// disconnect p2p, if any
@@ -294,6 +298,7 @@
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
 				// delete reference to call
 				delete Self.activeMessageId;
+				delete Self.data;
 				break;
 			// this is response via "notification"
 			case "response":
@@ -301,6 +306,7 @@
 					Self.receive({ action: "decline" });
 					// delete reference to call
 					delete Self.activeMessageId;
+					delete Self.data;
 				}
 				break;
 		}
@@ -320,6 +326,8 @@
 			Self.mediaConnection = Self.connection.call(user.uuid, stream);
 			Self.mediaConnection.on("stream", this.receiveStream.bind(this));
 			Self.mediaConnection.on("close", this.disconnect.bind(this));
+			// save reference to ongoing call
+			Self.activeMessageId = Self.mediaConnection.connectionId;
 		},
 		receiveCall(mediaConnection) {
 			let Self = bell.call;
@@ -343,6 +351,9 @@
 			if (Self.connection) {
 				Self.connection.disconnect();
 			}
+			// delete reference to call
+			delete Self.activeMessageId;
+			delete Self.data;
 			//delete bell.els.videoOther.find("video").srcObject;
 			Self.els.videoOther.html("<video></video>");
 		}
