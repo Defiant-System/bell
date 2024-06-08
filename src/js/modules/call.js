@@ -39,9 +39,6 @@
 					.then(stream => {
 						let video = Self.els.videoMe[0];
 						
-						// turn off audio - to prevent feedback
-						stream.getAudioTracks().map(audioTrack => audioTrack.stop());
-
 						// save reference to stream
 						Self.stream = stream;
 						Self.cameraTrack = stream.getVideoTracks()[0];
@@ -52,9 +49,9 @@
 
 						video.srcObject = Self.stream;
 						video.addEventListener("loadedmetadata", () => video.play());
-						if (karaqu.env === "dev") {
-							Self.dispatch({ type: "toggle-microphone", value: "off" });
-						}
+						// turn off audio - to prevent feedback
+						Self.dispatch({ type: "toggle-microphone", value: "off" });
+						// stream.getAudioTracks().map(audioTrack => audioTrack.stop());
 					});
 				break;
 			case "kill-camera":
@@ -116,8 +113,8 @@
 					.replaceTrack(Self.isCameraOff ? Self.canvasTrack : Self.cameraTrack);
 				break;
 			case "toggle-microphone":
-				isOn = event.value === "off" ? false : !Self.isMute;
-				// audio on vide element
+				isOn = event.value === "off" ? true : !Self.isMute;
+				// audio toggle video element
 				Self.els.videoMe[0].muted = isOn;
 				// ui update
 				Self.els.videoCall.find(".microphone > i").toggleClass("icon-mic-mute", Self.isMute);

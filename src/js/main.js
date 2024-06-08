@@ -40,10 +40,11 @@ const bell = {
 			case "window.init":
 				break;
 			case "window.close":
+				// seem like there is an unfinished call - end it
+				Self.call.dispatch({ type: "kill-camera" });
+				
+				// try again later
 				if (Self.call.data || Self.call.activeMessageId) {
-					// seem like there is an unfinished call - end it
-					Self.call.dispatch({ type: "kill-camera" });
-					// try again later
 					return setTimeout(() => Self.dispatch(event), 250);
 				}
 				// update settings
