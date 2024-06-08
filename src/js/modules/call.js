@@ -51,7 +51,6 @@
 						video.addEventListener("loadedmetadata", () => video.play());
 						// turn off audio - to prevent feedback
 						Self.dispatch({ type: "toggle-microphone", value: "off" });
-						// stream.getAudioTracks().map(audioTrack => audioTrack.stop());
 					});
 				break;
 			case "kill-camera":
@@ -116,8 +115,12 @@
 				isOn = event.value === "off" ? true : !Self.isMute;
 				// audio toggle video element
 				Self.els.videoMe[0].muted = isOn;
+
+				// toggle outgoing audio
+				Self.stream.getAudioTracks().map(audioTrack => audioTrack.enabled = isOn);
+
 				// ui update
-				Self.els.videoCall.find(".microphone > i").toggleClass("icon-mic-mute", Self.isMute);
+				Self.els.videoCall.find(".microphone > i").toggleClass("icon-mic-mute", !Self.isMute);
 				Self.isMute = !Self.isMute;
 				break;
 			// UI updates
@@ -174,6 +177,9 @@
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: "video-call" });
 				Self.dispatch({ type: "toggle-sidebar", value: "show" });
+
+				// turn off audio - to prevent feedback
+				Self.dispatch({ type: "toggle-microphone", value: "off" });
 
 				// send response to call request
 				window.net.send({
