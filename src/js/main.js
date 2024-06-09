@@ -8,6 +8,7 @@ let Pref = {
 			"expanded": true,
 			"active-tab": 2,
 		},
+		"log": "",
 	};
 
 const ME = karaqu.user;
@@ -16,6 +17,13 @@ const bell = {
 	init() {
 		// get settings, if any
 		this.settings = window.settings.getItem("settings") || Pref;
+		this.xLog = window.bluePrint.selectSingleNode(`//Data/History`);
+
+		// merge log
+		if (this.settings.log) {
+			let xLog = $.nodeFromString(this.settings.log);
+			xLog.selectNodes(`//log/i`).map(x => this.xLog.appendChild(x));
+		}
 
 		// init all sub-objects
 		Object.keys(this)
@@ -47,12 +55,15 @@ const bell = {
 				if (Self.call.data || Self.call.activeMessageId) {
 					return setTimeout(() => Self.dispatch(event), 250);
 				}
-				// update settings
+				// update settings; sidebar opened
 				value = Self.sidebar.els.sidebar.hasClass("open");
 				Self.settings.sidebar["expanded"] = value;
-				// update settings
+				// update settings; active tab
 				value = Self.sidebar.els.sidebar.find(".tab-view .tab-active").index();
 				Self.settings.sidebar["active-tab"] = value;
+				// update settings; logs
+				value = Self.xLog.selectNodes("./*").map(x => x.xml);
+				Self.settings.log = `<log>${value.join("")}</log>`;
 				// save settings
 				window.settings.setItem("settings", Self.settings);
 				break;

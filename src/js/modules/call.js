@@ -262,6 +262,9 @@
 					Self.dispatch({ type: "toggle-sidebar", value: "hide" });
 					Self.els.videoCall.addClass(`inbound-${type}-request`);
 
+					// play sound fx for inbound call
+					window.audio.fx("dong");
+
 					if (event.response !== undefined) {
 						action = (event.response === karaqu.AFFIRMATIVE) ? "accept" : "decline";
 						Self.dispatch({ ...event, action, type: action +"-call" });

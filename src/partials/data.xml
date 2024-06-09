@@ -1,10 +1,10 @@
 <!-- 
-		<i username="bill" inbound="0" type="camera" stamp="1663347054383" duration="49"/>
-        <i username="bill" inbound="0" type="camera" stamp="1663346995224" duration="0"/>
-        <i username="steve" inbound="1" type="camera" stamp="1663344973269" duration="7"/>
-        <i username="bill" inbound="1" type="camera" stamp="1663344360676" duration="23"/>
-        <i username="bill" inbound="1" type="camera" stamp="1653945889686" duration="0"/>
-        <i username="steve" inbound="1" type="camera" stamp="1653945828963" duration="0"/>
+	<i username="bill" inbound="0" type="camera" stamp="1663347054383" duration="49"/>
+    <i username="bill" inbound="0" type="camera" stamp="1663346995224" duration="0"/>
+    <i username="steve" inbound="1" type="camera" stamp="1663344973269" duration="7"/>
+    <i username="bill" inbound="1" type="camera" stamp="1663344360676" duration="23"/>
+    <i username="bill" inbound="1" type="camera" stamp="1653945889686" duration="0"/>
+    <i username="steve" inbound="1" type="camera" stamp="1653945828963" duration="0"/>
 -->
 
 <Data>
