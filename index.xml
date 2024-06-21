@@ -1,7 +1,7 @@
 <Application>
 	<Head>
 		<meta name="id" value="bell"/>
-		<meta name="title" value="Bell" version="1.27"/>
+		<meta name="title" value="Bell" version="1.29"/>
 		<meta name="author" value="Hakan Bilgin" namespace="ant"/>
 		<meta name="license" value="AGPL-3.0-or-later"/>
 		<meta name="repository" value="https://github.com/Defiant-System/bell"/>

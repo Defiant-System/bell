@@ -4,10 +4,15 @@ let Test = {
 
 		return;
 
-		if (ME.username === "hbi") {
-			let selector = `.friend[data-username="bill"] div[data-click="start-camera-call"]`;
-			setTimeout(() => APP.sidebar.els.sidebar.find(selector).trigger("click"), 1e3);
-		}
+		// setTimeout(() => {
+		// 	APP.call.els.videoMe.parent().toggleClass("hidden", APP.call.isCameraOff);
+		// }, 1e3);
+
+
+		// if (ME.username === "hbi") {
+		// 	let selector = `.friend[data-username="bill"] div[data-click="start-camera-call"]`;
+		// 	setTimeout(() => APP.sidebar.els.sidebar.find(selector).trigger("click"), 1e3);
+		// }
 
 		// if (ME.username === "bill") {
 		// 	let selector = `.friend[data-username="hbi"] div[data-click="start-camera-call"]`;

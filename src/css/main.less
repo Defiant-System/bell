@@ -261,7 +261,7 @@ content {
 			// applies to friends list and call entries
 			.actions {
 				width: 0;
-				overflow-y: hidden;
+				overflow: hidden;
 				margin-left: 5px;
 				padding-top: 3px;
 				text-align: right;
@@ -521,6 +521,10 @@ content {
 		border-radius: 5px;
 		overflow: hidden;
 		user-select: none;
+
+		.video-screen.me.hidden {
+			display: none;
+		}
 
 		&.inbound-voice-request {
 			.video-screen {

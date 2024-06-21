@@ -107,12 +107,16 @@
 				Self.els.videoCall.find(".camera > i").toggleClass("icon-camera-off", Self.isCameraOff);
 				Self.isCameraOff = !Self.isCameraOff;
 
+				// ui update self view
+				Self.els.videoMe.toggleClass("hidden", Self.isCameraOff);
+
 				Self.dispatch({ type: "render-stream-canvas" });
 				Self.mediaConnection.peerConnection.getSenders()[1]
 					.replaceTrack(Self.isCameraOff ? Self.canvasTrack : Self.cameraTrack);
 				break;
 			case "toggle-microphone":
 				isOn = event.value === "off" ? true : !Self.isMute;
+				// if (event.value === "on") isOn = false;
 				// audio toggle video element
 				Self.els.videoMe[0].muted = isOn;
 
@@ -159,6 +163,9 @@
 				user = karaqu.user.friend(Self.els.videoCall.data("username"));
 				// adapt screen based up on call type
 				Self.els.videoCall.prop({ className: `video-call ongoing-${Self.data.type}-call` });
+
+				// turn on audio
+				Self.dispatch({ type: "toggle-microphone", value: "on" });
 
 				// send response to call request
 				window.net.send({
